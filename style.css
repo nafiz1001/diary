@@ -1,0 +1,51 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* Takes full window height */
+  display: flex;
+  justify-content: start;
+  /* Centers horizontally */
+  align-items: center;
+  /* Centers vertically */
+  flex-direction: column;
+}
+
+nav {
+  font-size: 2em;
+
+  ul {
+    list-style-type: none;
+    display: flex;
+    padding: 0;
+    gap: 1em;
+    margin: 0.5em;
+  }
+
+  li {
+    padding: 0;
+  }
+}
+
+#submission-form {
+  display: flex;
+  height: 50vh;
+  gap: 0.5em;
+
+  textarea {
+    width: 70vw;
+  }
+
+  button {
+    width: 20vw;
+  }
+}
+
+#viewer-table {
+  border: 1px solid;
+
+  th,
+  td {
+    border: 1px solid;
+    padding: 0.5em 0.5em;
+  }
+}

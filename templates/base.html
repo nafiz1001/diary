@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <nav class="menu">
+    <ul>
+      <li><a href="/">Submission</a></li>
+      <li><a href="/viewer">Viewer</a></li>
+    </ul>
+  </nav>
+  {% block content %}{% endblock %}
+</body>
+
+</html>
