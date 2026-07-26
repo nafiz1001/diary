@@ -67,7 +67,7 @@
   <tbody>
     {% for entry in entries %}
     <tr>
-      <td>{{ entry.datetime.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      <td>{{ entry.datetime.strftime("%Y-%m-%d (%a) %H:%M:%S") }}</td>
       <td>{{ entry.note }}</td>
     </tr>
     {% endfor %}
