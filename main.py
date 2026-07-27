@@ -2,9 +2,10 @@ import hashlib
 import os
 import sqlite3
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from threading import RLock
 from typing import TypedDict
+from zoneinfo import ZoneInfo
 
 import uvicorn
 from fastapi import FastAPI, Request, Response, Form, Depends, status
@@ -77,7 +78,15 @@ async def index(request: Request):
 async def add_entry(
     submission: str = Form(...), db: sqlite3.Connection = Depends(get_db)
 ):
-    db.execute("INSERT INTO diary_entries (entry_text) VALUES (?)", (submission,))
+    db.execute(
+        "INSERT INTO diary_entries (entry_text, created_at) VALUES (?, ?)",
+        (
+            submission,
+            datetime.now(timezone.utc)
+            .replace(microsecond=0)
+            .strftime("%Y-%m-%dT%H:%M:%SZ"),
+        ),
+    )
     db.commit()
     # Redirect back to index with 303 See Other
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
@@ -94,7 +103,7 @@ async def viewer(
 
     # Fetch entries
     cursor.execute(
-        "SELECT created_at, entry_text FROM diary_entries ORDER BY created_at DESC LIMIT ? OFFSET ?",
+        "SELECT entry_text, created_at FROM diary_entries ORDER BY created_at DESC LIMIT ? OFFSET ?",
         (limit, offset),
     )
     rows = cursor.fetchall()
@@ -109,10 +118,10 @@ async def viewer(
     entries: list[Entry] = []
     for row in rows:
         try:
-            # Parse time mimicking Go's time.Parse(time.DateTime)
-            dt = datetime.strptime(row["created_at"], "%Y-%m-%d %H:%M:%S")
-            # In Python 3.6+, datetime.astimezone() converts to local time
-            dt = dt.astimezone()
+            dt = datetime.fromisoformat(row["created_at"])
+
+            # convert to local time (America/Montreal in my case)
+            dt = dt.astimezone(ZoneInfo("America/Montreal"))
         except ValueError:
             dt = datetime.now()
 

@@ -6,9 +6,5 @@ CREATE TABLE IF NOT EXISTS diary_entries (
     entry_text TEXT NOT NULL,
 
     -- Diary entry time (automatically defaults to UTC)
-    created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+    created_at TEXT NOT NULL
 );
-
--- Index to ensure fast sorting and chronological filtering
-CREATE INDEX IF NOT EXISTS idx_diary_entries_time 
-ON diary_entries(created_at DESC);
