@@ -4,12 +4,13 @@ import sqlite3
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from threading import RLock
-from typing import TypedDict
+from typing import Any, TypedDict
 from zoneinfo import ZoneInfo
 
 import uvicorn
 from fastapi import FastAPI, Request, Response, Form, Depends, status
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 DB_NAME = "sqlite.db"
@@ -92,6 +93,58 @@ async def add_entry(
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
 
+def get_diary_entry(entry_id: int, db: sqlite3.Connection) -> Any:
+    cursor = db.cursor()
+    cursor.execute(
+        "SELECT id, entry_text, created_at FROM diary_entries WHERE id = ?", (entry_id,)
+    )
+    return cursor.fetchone()
+
+
+@app.get("/update/{entry_id}", response_class=HTMLResponse)
+async def view_entry(
+    entry_id: int, request: Request, db: sqlite3.Connection = Depends(get_db)
+):
+    result = get_diary_entry(entry_id, db)
+
+    if result is None:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="update.html",
+        context=dict(
+            {"id": entry_id, "current": result["entry_text"], "updated": False}
+        ),
+    )
+
+
+@app.post("/update/{entry_id}")
+async def update_entry(
+    entry_id: int,
+    request: Request,
+    update: str = Form(...),
+    db: sqlite3.Connection = Depends(get_db),
+):
+    db.execute(
+        "UPDATE diary_entries SET entry_text = ? WHERE id = ?",
+        (update, entry_id),
+    )
+    db.commit()
+
+    result = get_diary_entry(entry_id, db)
+    if result is None:
+        return Response(status_code=status.HTTP_400_BAD_REQUEST)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="update.html",
+        context=dict(
+            {"id": entry_id, "current": result["entry_text"], "updated": True}
+        ),
+    )
+
+
 @app.get("/viewer", response_class=HTMLResponse)
 async def viewer(
     request: Request,
@@ -103,17 +156,14 @@ async def viewer(
 
     # Fetch entries
     cursor.execute(
-        "SELECT entry_text, created_at FROM diary_entries ORDER BY created_at DESC LIMIT ? OFFSET ?",
+        "SELECT id, entry_text, created_at FROM diary_entries ORDER BY created_at DESC LIMIT ? OFFSET ?",
         (limit, offset),
     )
     rows = cursor.fetchall()
 
     Entry = TypedDict(
         "Entry",
-        {
-            "datetime": datetime,
-            "note": str,
-        },
+        {"datetime": datetime, "note": str, "id": int},
     )
     entries: list[Entry] = []
     for row in rows:
@@ -125,7 +175,7 @@ async def viewer(
         except ValueError:
             dt = datetime.now()
 
-        entries.append({"datetime": dt, "note": row["entry_text"]})
+        entries.append({"datetime": dt, "note": row["entry_text"], "id": row["id"]})
 
     # Fetch total count
     cursor.execute("SELECT COUNT(*) FROM diary_entries")
@@ -161,27 +211,7 @@ async def viewer(
     )
 
 
-@app.get("/style.css")
-async def style(request: Request):
-    if not os.path.exists("style.css"):
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
-
-    with open("style.css", "rb") as f:
-        content = f.read()
-
-    etag = generate_etag(content)
-
-    if request.headers.get("if-none-match") == etag:
-        return Response(status_code=status.HTTP_304_NOT_MODIFIED)
-
-    headers = {
-        "Cache-Control": "max-age=3600, must-revalidate",
-        "ETag": etag,
-    }
-    return Response(
-        content=content, media_type="text/css; charset=utf-8", headers=headers
-    )
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True)

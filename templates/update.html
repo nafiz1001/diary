@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Diary | Update {{id}}{% endblock %}
+
+{% block content %}
+{% if updated %}<div>Updated Successfully!</div>{% endif %}
+<form id="submission-form" method="post" action="/update/{{id}}">
+  <textarea name="update">{{ current }}</textarea>
+  <button type="submit">Update</button>
+</form>
+{% endblock %}

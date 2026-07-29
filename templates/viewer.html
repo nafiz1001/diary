@@ -62,6 +62,7 @@
     <tr>
       <th scope="col">Time</th>
       <th scope="col">Note</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -69,6 +70,9 @@
     <tr>
       <td>{{ entry.datetime.strftime("%Y-%m-%d (%a) %H:%M:%S") }}</td>
       <td>{{ entry.note }}</td>
+      <td>
+        <a href="/update/{{entry.id}}">Update</a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
