@@ -1,4 +1,6 @@
+import csv
 import hashlib
+import io
 import os
 import sqlite3
 from contextlib import asynccontextmanager
@@ -8,12 +10,21 @@ from typing import Any, TypedDict
 from zoneinfo import ZoneInfo
 
 import uvicorn
-from fastapi import FastAPI, Request, Response, Form, Depends, status
+from fastapi import (
+    FastAPI,
+    Request,
+    Response,
+    Form,
+    Depends,
+    status,
+)
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 DB_NAME = "sqlite.db"
+
+tzinfo = ZoneInfo("America/Montreal")
 
 
 @asynccontextmanager
@@ -170,8 +181,7 @@ async def viewer(
         try:
             dt = datetime.fromisoformat(row["created_at"])
 
-            # convert to local time (America/Montreal in my case)
-            dt = dt.astimezone(ZoneInfo("America/Montreal"))
+            dt = dt.astimezone(tzinfo)
         except ValueError:
             dt = datetime.now()
 
@@ -208,6 +218,44 @@ async def viewer(
 
     return templates.TemplateResponse(
         request=request, name="viewer.html", context=dict(data)
+    )
+
+
+@app.get("/diary.tsv")
+def diary_tsv(
+    created_after: datetime,
+    db: sqlite3.Connection = Depends(get_db),
+):
+    cursor = db.cursor()
+
+    if created_after.tzinfo is None:
+        # If naive datetime is provided, assume tzinfo
+        created_after = created_after.replace(tzinfo=tzinfo)
+    created_after = created_after.astimezone(timezone.utc)
+
+    formatted_time = created_after.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    cursor.execute(
+        "SELECT id, entry_text, created_at FROM diary_entries WHERE created_at > ? ORDER BY created_at DESC",
+        (formatted_time,),
+    )
+
+    output = io.StringIO()
+    writer = csv.writer(output, delimiter="\t")
+    writer.writerow(["created_at", "entry_text"])
+    for row in cursor.fetchall():
+        clean_entry_text = (
+            row["entry_text"]
+            .replace("\n", "\\n")
+            .replace("\r", "\\r")
+            .replace("\t", "\\t")
+        )
+        writer.writerow([row["created_at"], clean_entry_text])
+
+    return Response(
+        content=output.getvalue(),
+        media_type="text/tab-separated-values",
+        headers={"Content-Disposition": 'attachment; filename="diary.tsv"'},
     )
 
 

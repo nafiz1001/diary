@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS diary_entries (
     -- Main body content of the diary entry
     entry_text TEXT NOT NULL,
 
-    -- Diary entry time (automatically defaults to UTC)
+    -- Diary entry time (in UTC with ISO 8601 format "%Y-%m-%dT%H:%M:%SZ")
     created_at TEXT NOT NULL
 );
