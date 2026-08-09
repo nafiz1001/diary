@@ -1,13 +1,8 @@
 body {
-  margin: 0;
-  min-height: 100vh;
-  /* Takes full window height */
   display: flex;
   justify-content: start;
-  /* Centers horizontally */
-  align-items: center;
-  /* Centers vertically */
-  flex-direction: column;
+  align-items: center; /* Centers horizontally */
+  flex-direction: column; /* Centers vertically */
 }
 
 nav {
@@ -16,9 +11,12 @@ nav {
   ul {
     list-style-type: none;
     display: flex;
+    flex-wrap: wrap;
     padding: 0;
-    gap: 1em;
+    gap: 0.2em 1em;
     margin: 0.5em;
+    align-items: center;
+    justify-content: center;
   }
 
   li {
@@ -46,6 +44,11 @@ nav {
   th,
   td {
     border: 1px solid;
-    padding: 0.5em 0.5em;
+    padding: 0.2em 0.2em;
   }
+}
+
+.break-hard {
+  hyphens: auto;
+  overflow-wrap: anywhere;
 }
