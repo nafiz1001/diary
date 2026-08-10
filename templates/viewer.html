@@ -69,7 +69,7 @@
     {% for entry in entries %}
     <tr>
       <td>{{ entry.datetime.strftime("%Y-%m-%d (%a) %H:%M:%S") }}</td>
-      <td class="break-hard">{{ entry.note }}</td>
+      <td class="break-hard" style="white-space: pre-wrap;">{{ entry.note }}</td>
       <td>
         <a href="/update/{{entry.id}}">Update</a>
       </td>
