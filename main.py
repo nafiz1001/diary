@@ -198,17 +198,17 @@ async def viewer(
 
 @app.get("/diary.tsv")
 def diary_tsv(
-    created_after: datetime,
+    created_since: datetime,
     session: Session = Depends(models.get_db_session),
 ):
-    if created_after.tzinfo is None:
+    if created_since.tzinfo is None:
         # If naive datetime is provided, assume client_tzinfo
-        created_after = created_after.replace(tzinfo=client_tzinfo)
-    created_after = created_after.astimezone(timezone.utc)
+        created_since = created_since.replace(tzinfo=client_tzinfo)
+    created_since = created_since.astimezone(timezone.utc)
 
     diary_entries = session.exec(
         select(DiaryEntry)
-        .where(DiaryEntry.created_at > created_after)
+        .where(DiaryEntry.created_at >= created_since)
         .order_by(desc(DiaryEntry.created_at))
     )
 
