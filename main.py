@@ -1,17 +1,21 @@
 import csv
 import hashlib
 import io
-import os
-import sqlite3
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from threading import RLock
-from typing import Any, TypedDict
+from typing import TypedDict
 from zoneinfo import ZoneInfo
 
+from sqlmodel import (
+    Session,
+    desc,
+    func,
+    select,
+)
 import uvicorn
 from fastapi import (
     FastAPI,
+    HTTPException,
     Request,
     Response,
     Form,
@@ -22,18 +26,15 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-DB_NAME = "sqlite.db"
+import models
+from models import DiaryEntry
 
-tzinfo = ZoneInfo("America/Montreal")
+client_tzinfo = ZoneInfo("America/Montreal")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Execute schema.sql on startup
-    if os.path.exists("schema.sql"):
-        with sqlite3.connect(DB_NAME) as conn:
-            with open("schema.sql", "r") as f:
-                conn.executescript(f.read())
+    models.create_all()
     yield
 
 
@@ -43,21 +44,6 @@ app = FastAPI(lifespan=lifespan)
 # We'll point it to the current directory to mimic the Go structure,
 # but usually, you'd put these in a "templates" folder.
 templates = Jinja2Templates(directory="templates/")
-
-
-lock = RLock()
-
-
-def get_db():
-    """Dependency to get a database connection per request."""
-    conn = sqlite3.connect(DB_NAME, check_same_thread=False)
-    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
-    try:
-        lock.acquire()
-        yield conn
-    finally:
-        conn.close()
-        lock.release()
 
 
 def generate_etag(content: bytes) -> str:
@@ -88,46 +74,34 @@ async def index(request: Request):
 
 @app.post("/")
 async def add_entry(
-    submission: str = Form(...), db: sqlite3.Connection = Depends(get_db)
+    submission: str = Form(...), session: Session = Depends(models.get_db_session)
 ):
-    db.execute(
-        "INSERT INTO diary_entries (entry_text, created_at) VALUES (?, ?)",
-        (
-            submission,
-            datetime.now(timezone.utc)
-            .replace(microsecond=0)
-            .strftime("%Y-%m-%dT%H:%M:%SZ"),
-        ),
-    )
-    db.commit()
-    # Redirect back to index with 303 See Other
+    session.add(DiaryEntry(entry_text=submission))
+    session.commit()
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-
-
-def get_diary_entry(entry_id: int, db: sqlite3.Connection) -> Any:
-    cursor = db.cursor()
-    cursor.execute(
-        "SELECT id, entry_text, created_at FROM diary_entries WHERE id = ?", (entry_id,)
-    )
-    return cursor.fetchone()
 
 
 @app.get("/update/{entry_id}", response_class=HTMLResponse)
 async def view_entry(
-    entry_id: int, request: Request, db: sqlite3.Connection = Depends(get_db)
+    entry_id: int, request: Request, session: Session = Depends(models.get_db_session)
 ):
-    result = get_diary_entry(entry_id, db)
-
-    if result is None:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
-
-    return templates.TemplateResponse(
-        request=request,
-        name="update.html",
-        context=dict(
-            {"id": entry_id, "current": result["entry_text"], "updated": False}
-        ),
-    )
+    try:
+        diary_entry = session.exec(
+            select(DiaryEntry).where(DiaryEntry.id == entry_id)
+        ).one()
+        return templates.TemplateResponse(
+            request=request,
+            name="update.html",
+            context=dict(
+                {
+                    "id": diary_entry.id,
+                    "current": diary_entry.entry_text,
+                    "updated": False,
+                }
+            ),
+        )
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @app.post("/update/{entry_id}")
@@ -135,23 +109,29 @@ async def update_entry(
     entry_id: int,
     request: Request,
     update: str = Form(...),
-    db: sqlite3.Connection = Depends(get_db),
+    session: Session = Depends(models.get_db_session),
 ):
-    db.execute(
-        "UPDATE diary_entries SET entry_text = ? WHERE id = ?",
-        (update, entry_id),
-    )
-    db.commit()
+    diary_entry = session.exec(
+        select(DiaryEntry).where(DiaryEntry.id == entry_id)
+    ).one()
 
-    result = get_diary_entry(entry_id, db)
-    if result is None:
-        return Response(status_code=status.HTTP_400_BAD_REQUEST)
+    diary_entry.entry_text = update
+    session.add(diary_entry)
+    session.commit()
+
+    diary_entry = session.exec(
+        select(DiaryEntry).where(DiaryEntry.id == entry_id)
+    ).one()
 
     return templates.TemplateResponse(
         request=request,
         name="update.html",
         context=dict(
-            {"id": entry_id, "current": result["entry_text"], "updated": True}
+            {
+                "id": diary_entry.id,
+                "current": diary_entry.entry_text,
+                "updated": True,
+            }
         ),
     )
 
@@ -161,35 +141,30 @@ async def viewer(
     request: Request,
     limit: int = 10,
     offset: int = 0,
-    db: sqlite3.Connection = Depends(get_db),
+    session: Session = Depends(models.get_db_session),
 ):
-    cursor = db.cursor()
-
-    # Fetch entries
-    cursor.execute(
-        "SELECT id, entry_text, created_at FROM diary_entries ORDER BY created_at DESC LIMIT ? OFFSET ?",
-        (limit, offset),
+    diary_entries = session.exec(
+        select(DiaryEntry)
+        .order_by(desc(DiaryEntry.created_at))
+        .offset(offset)
+        .limit(limit)
     )
-    rows = cursor.fetchall()
 
     Entry = TypedDict(
         "Entry",
         {"datetime": datetime, "note": str, "id": int},
     )
     entries: list[Entry] = []
-    for row in rows:
-        try:
-            dt = datetime.fromisoformat(row["created_at"])
+    for diary_entry in diary_entries:
+        entries.append(
+            {
+                "datetime": diary_entry.created_at.astimezone(client_tzinfo),
+                "note": diary_entry.entry_text,
+                "id": diary_entry.id,  # pyright: ignore[reportArgumentType]
+            }
+        )
 
-            dt = dt.astimezone(tzinfo)
-        except ValueError:
-            dt = datetime.now()
-
-        entries.append({"datetime": dt, "note": row["entry_text"], "id": row["id"]})
-
-    # Fetch total count
-    cursor.execute("SELECT COUNT(*) FROM diary_entries")
-    total = cursor.fetchone()[0] or 0
+    total = session.exec(select(func.count()).select_from(DiaryEntry)).one()
 
     # Calculate bounds
     offset = max(min(offset, total - 1), 0) if total > 0 else 0
@@ -224,33 +199,36 @@ async def viewer(
 @app.get("/diary.tsv")
 def diary_tsv(
     created_after: datetime,
-    db: sqlite3.Connection = Depends(get_db),
+    session: Session = Depends(models.get_db_session),
 ):
-    cursor = db.cursor()
-
     if created_after.tzinfo is None:
-        # If naive datetime is provided, assume tzinfo
-        created_after = created_after.replace(tzinfo=tzinfo)
+        # If naive datetime is provided, assume client_tzinfo
+        created_after = created_after.replace(tzinfo=client_tzinfo)
     created_after = created_after.astimezone(timezone.utc)
 
-    formatted_time = created_after.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    cursor.execute(
-        "SELECT id, entry_text, created_at FROM diary_entries WHERE created_at > ? ORDER BY created_at DESC",
-        (formatted_time,),
+    diary_entries = session.exec(
+        select(DiaryEntry)
+        .where(DiaryEntry.created_at > created_after)
+        .order_by(desc(DiaryEntry.created_at))
     )
 
     output = io.StringIO()
     writer = csv.writer(output, delimiter="\t")
     writer.writerow(["created_at", "entry_text"])
-    for row in cursor.fetchall():
+    for diary_entry in diary_entries:
         clean_entry_text = (
-            row["entry_text"]
-            .replace("\n", "\\n")
+            diary_entry.entry_text.replace("\n", "\\n")
             .replace("\r", "\\r")
             .replace("\t", "\\t")
         )
-        writer.writerow([row["created_at"], clean_entry_text])
+        writer.writerow(
+            [
+                diary_entry.created_at.astimezone(client_tzinfo).strftime(
+                    "%Y-%m-%dT%H:%M:%S%z"
+                ),
+                clean_entry_text,
+            ]
+        )
 
     return Response(
         content=output.getvalue(),
