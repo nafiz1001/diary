@@ -51,24 +51,13 @@ def generate_etag(content: bytes) -> str:
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def index():
     # Render template to string to compute ETag
     template = templates.get_template("index.html")
     html_content = template.render()
-    content_bytes = html_content.encode("utf-8")
-
-    etag = generate_etag(content_bytes)
-
-    # Check If-None-Match header
-    if request.headers.get("if-none-match") == etag:
-        return Response(status_code=status.HTTP_304_NOT_MODIFIED)
 
     return HTMLResponse(
         content=html_content,
-        headers={
-            "Cache-Control": "max-age=3600, must-revalidate",
-            "ETag": etag,
-        },
     )
 
 
