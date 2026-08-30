@@ -185,6 +185,16 @@ async def viewer(
     )
 
 
+@app.get("/export/", response_class=HTMLResponse)
+async def export():
+    template = templates.get_template("export.html")
+    html_content = template.render()
+
+    return HTMLResponse(
+        content=html_content,
+    )
+
+
 @app.get("/diary.tsv")
 def diary_tsv(
     created_since: datetime,

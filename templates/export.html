@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Diary | Export {{id}}{% endblock %}
+
+{% block content %}
+<form id="filter-form" method="get" action="/diary.tsv">
+    <table>
+      <tr>
+        <td><label for="created_since">Created since:</label></td>
+        <td><input name="created_since" type="date"/></td>
+      </tr>
+    </table>
+    <button type="submit">Export</button>
+  </form>
+{% endblock %}
