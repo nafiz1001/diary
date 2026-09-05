@@ -6,6 +6,6 @@
 <div id="submission-status">{% if updated %}Updated Successfully!{% else %}{% endif %}</div>
 <form id="update-form" class="submission-form" method="post" action="/update/{{id}}">
   <textarea name="update">{{ current }}</textarea>
-  <button type="submit">Update</button>
+  <button id="submission-button" type="submit">Update</button>
 </form>
 {% endblock %}
