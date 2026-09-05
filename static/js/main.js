@@ -2,58 +2,33 @@ function submissionMain() {
   /**
    * @type {HTMLFormElement | null}
    */
-  const submissionForm = document.getElementById("submission-form")
-  if (submissionForm) {
-    /**
-     * @type {HTMLDivElement | null}
-     */
-    const submissionStatus = document.getElementById("submission-status")
-    if (!submissionStatus) {
-      alert("Failed to find submission-status element.")
-      return
-    }
+  const form = document.getElementById("submission-form");
+  const status = document.getElementById("submission-status");
+  if (!form || !status) return;
 
-    /**
-     * @type {number | undefined}
-     */
-    let timeout = undefined
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    submissionForm.addEventListener('submit', async (e) => {
-      // 1. Stop the browser from navigating/redirecting
-      e.preventDefault();
+    try {
+      const response = await fetch(form.action, {
+        method: form.method,
+        body: new FormData(form),
+      });
 
-      // 2. Extract form data
-      const formData = new FormData(submissionForm);
-
-      try {
-        // 3. Send the request asynchronously
-        const response = await fetch(submissionForm.action, {
-          method: submissionForm.method,
-          body: formData, // Standard form data (multipart/form-data)
-        })
-
-        if (timeout) {
-          clearTimeout(timeout)
-          timeout = undefined
-        }
-        timeout = setTimeout(() => {
-          submissionStatus.innerText = ""
-          timeout = undefined
-        }, 3000)
-
-        if (response.ok) {
-          submissionStatus.innerText = "Successfully submitted entry."
-        } else {
-          submissionStatus.innerText = "Failed to submit entry."
-          alert(JSON.stringify(await response.json(), undefined, 2))
-        }
-      } catch (error) {
-        alert(error)
+      if (response.ok) {
+        form.reset();
+      } else {
+        alert(JSON.stringify(await response.json(), null, 2));
       }
-    })
 
-    return
-  }
+      status.innerText = response.ok
+        ? "Successfully submitted entry."
+        : "Failed to submit entry.";
+    } catch (error) {
+      alert(error);
+      status.innerText = "Failed to submit entry.";
+    }
+  });
 }
 
 submissionMain()
