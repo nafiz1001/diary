@@ -7,12 +7,18 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
+[*.py]
+indent_style = space
+indent_size = 4
+max_line_length = 88
+
 [*.{html,htm,css}]
 indent_style = space
 indent_size = 2
 max_line_length = 120
 
-[*.py]
+# JavaScript, TypeScript, and JSX configurations
+[*.{js,jsx,ts,tsx,mjs,cjs}]
 indent_style = space
-indent_size = 4
-max_line_length = 88
+indent_size = 2
+quote_type = single
