@@ -3,7 +3,7 @@ import hashlib
 import io
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import TypedDict
+from typing import Literal, TypedDict
 from zoneinfo import ZoneInfo
 
 from sqlmodel import (
@@ -16,6 +16,7 @@ import uvicorn
 from fastapi import (
     FastAPI,
     HTTPException,
+    Query,
     Request,
     Response,
     Form,
@@ -185,14 +186,76 @@ async def viewer(
     )
 
 
-@app.get("/export/", response_class=HTMLResponse)
-async def export():
-    template = templates.get_template("export.html")
-    html_content = template.render()
+@app.get("/export/")
+async def export(
+    created_since: datetime | None = None,
+    _format: Literal["tsv", "markdown"] | None = Query(None, alias="format"),
+    order: Literal["created_at", "-created_at"] | None = None,
+    session: Session = Depends(models.get_db_session),
+):
+    if not created_since or not _format:
+        template = templates.get_template("export.html")
+        html_content = template.render()
 
-    return HTMLResponse(
-        content=html_content,
-    )
+        return HTMLResponse(
+            content=html_content,
+        )
+
+    if created_since.tzinfo is None:
+        # If naive datetime is provided, assume client_tzinfo
+        created_since = created_since.replace(tzinfo=client_tzinfo)
+    created_since = created_since.astimezone(timezone.utc)
+
+    statement = select(DiaryEntry).where(DiaryEntry.created_at >= created_since)
+
+    if order == "-created_at":
+        statement = statement.order_by(desc(DiaryEntry.created_at))
+
+    diary_entries = session.exec(statement)
+
+    if _format == "tsv":
+        output = io.StringIO()
+        writer = csv.writer(output, delimiter="\t")
+        writer.writerow(["created_at", "entry_text"])
+        for diary_entry in diary_entries:
+            clean_entry_text = (
+                diary_entry.entry_text.replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+            )
+            writer.writerow(
+                [
+                    diary_entry.created_at.astimezone(client_tzinfo).strftime(
+                        "%Y-%m-%dT%H:%M:%S%z"
+                    ),
+                    clean_entry_text,
+                ]
+            )
+
+        return Response(
+            content=output.getvalue(),
+            media_type="text/tab-separated-values",
+            headers={"Content-Disposition": 'attachment; filename="diary.tsv"'},
+        )
+    elif _format == "markdown":
+        output = io.StringIO()
+        output.write("|created_at|entry_text|\n")
+        output.write("|-|-|\n")
+        for diary_entry in diary_entries:
+            clean_created_at = diary_entry.created_at.astimezone(
+                client_tzinfo
+            ).strftime("%Y-%m-%dT%H:%M:%S%z")
+            clean_entry_text = (
+                diary_entry.entry_text.replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t")
+            )
+            output.write(f"|{clean_created_at}|{clean_entry_text}|\n")
+        return Response(
+            content=output.getvalue(),
+            media_type="text/markdown",
+            headers={"Content-Disposition": 'attachment; filename="diary.md"'},
+        )
 
 
 @app.get("/diary.tsv")
