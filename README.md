@@ -1,0 +1,26 @@
+# Diary
+
+A personal diary for one user: write notes, browse them, correct them and export them.
+
+The project is spec-driven. The specification is language-agnostic. Implementations are generated from it.
+
+| Path | Content |
+|------|---------|
+| [`specs/`](specs/README.md) | Requirements (EARS), behaviour (Gherkin, state machines), architecture (domain model, C4, arc42, ADRs), design (UI/UX, LLD, OpenAPI, SQL schema). |
+| `implementations/go-net-http/` | Implementation generated from the spec (ADR-0006). It is on disk but not tracked in git (`.gitignore`). Its README explains how to run, test and import. |
+
+Start with [`specs/README.md`](specs/README.md) for the layers, the ID scheme and the change workflow.
+[`specs/traceability.md`](specs/traceability.md) links each requirement to its scenarios, design and tests.
+
+## Legacy reference
+
+The code before the restart is in the tag `legacy-v0.1.0`. It is not in the working tree.
+To run it as a reference, check it out in a separate worktree, outside this folder:
+
+```bash
+git worktree add --detach ../diary-legacy legacy-v0.1.0
+```
+
+The old files are at the root of that worktree (`main.py`, `models.py`, `templates/`, `pyproject.toml`).
+The legacy app keeps its entries in `sqlite.db` in its working directory. Use a copy of that file to test the import.
+Remove the worktree with `git worktree remove ../diary-legacy` when you no longer need it.

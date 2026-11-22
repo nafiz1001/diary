@@ -222,3 +222,6 @@ __marimo__/
 *.db
 *.tsv
 *.csv
+
+# Implementations are generated from specs/ and are not tracked
+implementations/

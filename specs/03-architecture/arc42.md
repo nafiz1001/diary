@@ -133,6 +133,7 @@ Quality tree: correctness, performance, portability, usability.
 | R-5 | No sign-in. Anyone who reaches the address can read the diary. | Listen on a local address by default. |
 | R-6 | The first slice has a schema with no `updated_at`. | Phase 5 completes the schema. Phase 6 changes the first implementation. |
 | R-7 | The legacy store file is not in the repository, so the import test needs a copy from the user. | Ask the user for a copy in phase 6. |
+| R-8 | The OpenAPI file has not been checked with a dedicated linter. A library loads and validates it in the contract test. | Run a linter before a second implementation relies on the file. |
 
 ## 12. Glossary
 

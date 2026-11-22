@@ -152,3 +152,6 @@ Details of the import are in `functional-spec.md` (UC-IMP) and, from phase 5, `.
 10. `Given an empty diary` means a new entry store with no entry. For import scenarios it is the new store.
 11. The effective values of the viewer (`limit` and `offset`) are the values after clamping (TS-PAGE-3 and TS-PAGE-4).
 12. `the system answers "not found"` means the user is told that the entry does not exist, whatever the form of the answer.
+13. A step that compares an Instant with a given time (`has the creation instant "T" UTC`) compares at one-second resolution. The store keeps microseconds (TS-TIME-3).
+14. `the entry store is unavailable` makes every later use of the store fail with `store_unavailable`.
+15. `Given the entry store is configured at a location other than the default` makes the scenario use another location for the entry store. The default location is the one in the configuration table.

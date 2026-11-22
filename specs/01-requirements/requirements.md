@@ -8,7 +8,7 @@ Legacy behaviour is the base. A line that starts with "Fixes legacy" marks a cha
 | ID | Pattern | Requirement |
 |----|---------|-------------|
 | REQ-SUB-001 | Event-driven | When the user submits entry text, the system shall store a new entry with that text and the current time in UTC. |
-| REQ-SUB-002 | Unwanted behaviour | If the entry text is empty or has only whitespace, then the system shall reject the submission, store no entry and keep the text in the form. Fixes legacy: the legacy implementation stores empty entries. |
+| REQ-SUB-002 | Unwanted behaviour | If the entry text is empty or has only whitespace, then the system shall reject the submission, store no entry and keep the text in the form. Fixes legacy: the legacy implementation stores whitespace-only text (it rejects only the exactly empty text). |
 | REQ-SUB-003 | Event-driven | When the system has stored an entry, the system shall show an empty form and tell the user that the entry was saved. |
 | REQ-SUB-004 | State-driven | While a submission is in progress, the system shall prevent a second submission from the same form. |
 | REQ-SUB-005 | Ubiquitous | The system shall store the entry text exactly as the user entered it, with no trimming and no change of line breaks. |
@@ -35,7 +35,7 @@ Legacy behaviour is the base. A line that starts with "Fixes legacy" marks a cha
 | REQ-UPD-001 | Event-driven | When the user opens the update page of an existing entry, the system shall show a form that holds the current text of that entry. |
 | REQ-UPD-002 | Event-driven | When the user submits valid text for an existing entry, the system shall replace the text, set the update instant to the current time in UTC, show the form with the new text and tell the user that the entry was updated. |
 | REQ-UPD-003 | Unwanted behaviour | If the user requests an entry id that does not exist, then the system shall respond "not found" and change nothing. Fixes legacy: the legacy implementation fails with a server error on save. |
-| REQ-UPD-004 | Unwanted behaviour | If the new text is empty or has only whitespace, then the system shall reject the update, keep the stored text and keep the text in the form. Fixes legacy: the legacy implementation stores empty text. |
+| REQ-UPD-004 | Unwanted behaviour | If the new text is empty or has only whitespace, then the system shall reject the update, keep the stored text and keep the text in the form. Fixes legacy: the legacy implementation stores whitespace-only text. |
 | REQ-UPD-005 | Ubiquitous | The system shall store the updated text exactly as the user entered it. |
 | REQ-UPD-006 | State-driven | While an update is in progress, the system shall prevent a second submission from the same form. |
 | REQ-UPD-007 | Unwanted behaviour | If the system cannot store the update, then the system shall tell the user that the update failed, keep the stored text and keep the text in the form. |
