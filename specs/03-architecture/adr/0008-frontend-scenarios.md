@@ -37,4 +37,4 @@ Rejected option 3: it adds a second format and ID scheme for checks, and a check
 - Good: one format and one place for all behaviour checks.
 - Good: a check starts manual and becomes automated later with no change to the spec.
 - Bad: a manual check is slow and a person can miss a step. `traceability.md` records the date and the result of each manual check.
-- Follow-up: the implementation of ADR-0006 has no recorded check of the new frontend scenarios and reads pages with text patterns (risk R-9 in arc42).
+- Follow-up: no implementation exists yet (ADR-0006 deprecated).

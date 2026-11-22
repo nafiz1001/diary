@@ -1,6 +1,6 @@
 # Diary specification
 
-Version: 1.1.0 (ADR-0010). Changes: [`../CHANGELOG.md`](../CHANGELOG.md).
+Version: 1.1.1 (ADR-0010). Changes: [`../CHANGELOG.md`](../CHANGELOG.md).
 
 This folder holds the layered, language-agnostic specification of the diary.
 Each implementation in `implementations/<stack>/` is generated from it.

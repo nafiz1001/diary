@@ -4,6 +4,17 @@ All notable changes to the spec are in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 The version follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as set by ADR-0010.
 
+## [1.1.1] - 2026-11-22
+
+### Removed
+
+- The Go implementation of ADR-0006. ADR-0006 is deprecated.
+- The implementation column in `specs/traceability.md`. The checks that need an implementation show "Not done".
+
+### Changed
+
+- Risks R-9 and R-10 in arc42 are closed. The next implementation reads pages by markers (TS-RUN) and implements REQ-NFR-008 to REQ-NFR-010.
+
 ## [1.1.0] - 2026-11-22
 
 ### Added

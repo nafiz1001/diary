@@ -1,6 +1,6 @@
 # ADR-0006: First spec-generated implementation in Go
 
-- Status: accepted
+- Status: deprecated (2026-11-22)
 - Date: 2026-11-22
 
 ## Context and problem statement
@@ -34,3 +34,4 @@ It keeps the table and column names, the column types in meaning, and the constr
 - Good: a different stack from the legacy code, so the spec is tested for portability.
 - Good: one static binary. No interpreter or virtual environment to run.
 - Bad: three third-party modules for the database, BDD and contract test. The module file pins them.
+- Deprecated: the implementation was removed before it passed spec 1.1.0. No implementation exists. A later ADR adds the next one.

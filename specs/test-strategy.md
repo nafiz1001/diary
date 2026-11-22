@@ -33,7 +33,7 @@ The test column of `traceability.md` uses the names in the second column (`bdd`,
 | Binding rule | An implementation adds step bindings, not scenarios. | `README.md`, rule 3 |
 
 The runner and the test command of an implementation are in the README of that implementation
-and in the ADR that adds it (for example ADR-0006).
+and in the ADR that adds it.
 
 ## 4. Test data
 
@@ -89,6 +89,6 @@ A manual check records the date, the person or the runner, and the result.
 | Item | Status | Source |
 |------|--------|--------|
 | R-8 OpenAPI lint | Closed. The workflow lints the file and the first run was green. | `03-architecture/arc42.md` |
-| R-9 Page reading by text patterns, `@frontend` scenarios not checked | Open | `03-architecture/arc42.md` |
-| R-10 REQ-NFR-008 to REQ-NFR-010 not implemented | Open | `03-architecture/arc42.md` |
+| R-9 Page reading by text patterns, `@frontend` scenarios not checked | Closed (implementation removed) | `03-architecture/arc42.md` |
+| R-10 REQ-NFR-008 to REQ-NFR-010 not implemented | Closed (implementation removed) | `03-architecture/arc42.md` |
 | Import on a copy of the real legacy store | Open (R-7) | `traceability.md` |

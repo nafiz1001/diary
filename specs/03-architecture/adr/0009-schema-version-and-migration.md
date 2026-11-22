@@ -47,5 +47,5 @@ Rejected option 3: it leaves a store in a mixed state while the system runs, and
 - Bad: no downgrade. The operator restores a backup to go back (operator guide, section 5).
 - Bad: a store from the first slice has an `entries` table and no version row. The system does not support it,
   because ADR-0007 states that the store of the first slice is not kept. The behaviour for such a store is not defined.
-- Bad: the implementation of ADR-0006 does not implement these requirements yet (risk R-10 in arc42).
+- Note: no implementation exists yet (ADR-0006 deprecated).
 - Follow-up: a copy of the store while the system runs is not safe. A backup command or an online backup is a possible later change.

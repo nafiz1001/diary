@@ -9,7 +9,8 @@ The project is spec-driven. The specification is language-agnostic. Implementati
 | [`specs/`](specs/README.md) | Requirements (EARS), behaviour (Gherkin, state machines), architecture (domain model, C4, arc42, ADRs), design (UI/UX, LLD, OpenAPI, SQL schema). |
 | [`docs/operator-guide.md`](docs/operator-guide.md) | How to configure, start, back up, restore and upgrade the system, and how to run the one-time import. |
 | [`CHANGELOG.md`](CHANGELOG.md) | Versions of the spec. |
-| `implementations/go-net-http/` | Implementation generated from the spec (ADR-0006). Its README explains how to run, test and import. |
+
+No implementation exists now. Each implementation goes in `implementations/<stack>/` (ADR-0003).
 
 Start with [`specs/README.md`](specs/README.md) for the layers, the ID scheme and the change workflow.
 [`specs/traceability.md`](specs/traceability.md) links each requirement to its scenarios, design and tests.
