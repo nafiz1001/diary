@@ -21,3 +21,17 @@ One term has one meaning. Add terms here before other files use them.
 | Submission | The act of the user sending entry text to the system to create an entry. |
 | Entry store | The place where the system keeps entries. |
 | Form | The page element where the user types entry text. |
+| Update instant | The Instant of the last change of the entry text. Equals the creation instant until the first update. |
+| Update | The act of the user replacing the text of an existing entry. |
+| Viewer | The page that lists entries in pages. |
+| Page | One slice of the diary that the viewer shows. Has a limit, an offset and the total. |
+| Limit | The number of entries on a page. Default 10, range 1 to 100. |
+| Offset | The number of entries before the first entry of a page, counted newest first. Default 0. |
+| Total | The number of entries in the diary. |
+| Calendar date | A date with no time and no zone. |
+| Export | A file that holds entries, in Markdown or tab-separated form. |
+| Export request | The date, order and format that the user chooses for an export. |
+| Created since | The calendar date that starts an export. The system includes entries created at or after the start of that date in the display zone. |
+| Legacy store | The entry store file of the legacy implementation. |
+| Operator | The user, when the user runs the import tool. |
+| Import | The one-time copy of all legacy entries into the new store. |

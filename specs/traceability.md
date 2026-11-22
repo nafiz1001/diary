@@ -13,3 +13,43 @@ Test column key: `bdd` = scenario in `features/` run by the BDD runner. `contrac
 | REQ-SUB-004 | A second send is blocked while the first is in progress (`@manual`) | ui-ux form state machine | manual |
 | REQ-SUB-005 | The text is stored exactly as entered (outline) | BR-SUB-2, TS-TEXT-1, TS-TEXT-2 | bdd |
 | REQ-SUB-006 | A store failure keeps the text | functional-spec alternative 5a, lld HTTP outcomes, openapi 503 | bdd, contract |
+| REQ-BRW-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-008 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-009 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-UPD-008 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-008 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-009 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-EXP-010 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-IMP-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-NFR-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-NFR-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-NFR-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-NFR-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-NFR-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-NFR-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
