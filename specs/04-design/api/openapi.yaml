@@ -1,18 +1,30 @@
 openapi: 3.1.0
 info:
   title: Diary
-  version: 0.1.0
-  description: HTTP contract of the diary. Version 0.1.0 covers the submit page only.
+  version: 0.2.0
+  description: |
+    HTTP contract of the diary. Covers all pages, forms and the export file.
+    Form routes answer with pages. When a request has `Accept: application/json`,
+    `POST /` and `POST /update/{id}` answer with JSON instead (ADR-0004).
+    Static assets of the pages (script, style) are not part of this contract.
+    Page bodies are described as text. Their markers are in `04-design/ui-ux.md`.
+    Behaviour is in `specs/features/*.feature` and `02-specification/functional-spec.md`.
+tags:
+  - name: submit
+  - name: browse
+  - name: update
+  - name: export
 paths:
   /:
     get:
+      tags: [submit]
       summary: Show the submit page
       operationId: showSubmitPage
       parameters:
         - name: saved
           in: query
           required: false
-          description: When `1`, the page shows the message "Entry saved."
+          description: When `1`, the page shows the message "Entry saved." (REQ-SUB-003)
           schema:
             type: string
             enum: ["1"]
@@ -24,6 +36,7 @@ paths:
               schema:
                 type: string
     post:
+      tags: [submit]
       summary: Submit an entry
       operationId: submitEntry
       description: |
@@ -35,19 +48,10 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              required: [submission]
-              properties:
-                submission:
-                  type: string
-                  description: The entry text. Stored exactly as sent.
+              $ref: "#/components/schemas/SubmitForm"
           multipart/form-data:
             schema:
-              type: object
-              required: [submission]
-              properties:
-                submission:
-                  type: string
+              $ref: "#/components/schemas/SubmitForm"
       responses:
         "201":
           description: Entry saved (JSON request).
@@ -63,25 +67,176 @@ paths:
                 type: string
                 const: /?saved=1
         "422":
-          description: The text is whitespace only. Nothing is stored.
+          $ref: "#/components/responses/EmptyText"
+        "503":
+          $ref: "#/components/responses/StoreUnavailable"
+  /viewer:
+    get:
+      tags: [browse]
+      summary: Show one page of entries, newest first
+      operationId: showViewer
+      description: |
+        Requirements REQ-BRW-001 to REQ-BRW-009.
+        `limit` and `offset` are read as integers. A value that is not an integer counts as not given.
+        The system clamps both into range before it reads entries (TS-PAGE-1 to TS-PAGE-5).
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Entries per page. Default 10. Clamped to 1 to 100.
+          schema:
+            type: string
+        - name: offset
+          in: query
+          required: false
+          description: Entries before the first shown entry. Default 0. Clamped to 0 to total minus 1.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The viewer page.
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
             text/html:
               schema:
                 type: string
         "503":
-          description: The entry store failed. Nothing is stored.
+          $ref: "#/components/responses/StoreUnavailablePage"
+  /update/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id of the entry. Digits only. Any other value is "not found".
+        schema:
+          type: string
+    get:
+      tags: [update]
+      summary: Show the update page of an entry
+      operationId: showUpdatePage
+      responses:
+        "200":
+          description: The update page. The text area holds the current text (REQ-UPD-001).
           content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
             text/html:
               schema:
                 type: string
+        "404":
+          $ref: "#/components/responses/NotFoundPage"
+        "503":
+          $ref: "#/components/responses/StoreUnavailablePage"
+    post:
+      tags: [update]
+      summary: Replace the text of an entry
+      operationId: updateEntry
+      description: |
+        Requirements REQ-UPD-002 to REQ-UPD-008.
+        Without `Accept: application/json` the system answers with the update page.
+        With it, the system answers with JSON.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/UpdateForm"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UpdateForm"
+      responses:
+        "200":
+          description: Entry updated. A page request gets the update page with the new text and the message "Entry updated."
+          content:
+            text/html:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdatedEntry"
+        "404":
+          description: No entry has this id. Nothing changed.
+          content:
+            text/html:
+              schema:
+                type: string
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "422":
+          $ref: "#/components/responses/EmptyText"
+        "503":
+          $ref: "#/components/responses/StoreUnavailable"
+  /export:
+    get:
+      tags: [export]
+      summary: Show the export page, or deliver an export file
+      operationId: exportEntries
+      description: |
+        Requirements REQ-EXP-001 to REQ-EXP-010.
+        With no parameter, the system shows the export form.
+        With any parameter, the system checks the request (LLD 2.5). A valid request gets a file.
+        An invalid request gets the export form with a message and no file.
+        `created_since` has the form `YYYY-MM-DD`. The file holds entries created at or after
+        the start of that date in the display zone.
+      parameters:
+        - name: created_since
+          in: query
+          required: false
+          description: Date in the form `YYYY-MM-DD`. Required for a file.
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: false
+          description: "`markdown` or `tsv`. Required for a file."
+          schema:
+            type: string
+        - name: order
+          in: query
+          required: false
+          description: "`ascending` or `descending`. Absent or unknown means `ascending`."
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The export form (no parameter), or the export file.
+          content:
+            text/html:
+              schema:
+                type: string
+            text/markdown:
+              schema:
+                type: string
+            text/tab-separated-values:
+              schema:
+                type: string
+          headers:
+            Content-Disposition:
+              description: For a file, `attachment; filename="diary.md"` or `attachment; filename="diary.tsv"`.
+              schema:
+                type: string
+        "422":
+          description: The date or the format is missing or invalid. The page shows a message. No file.
+          content:
+            text/html:
+              schema:
+                type: string
+        "503":
+          $ref: "#/components/responses/StoreUnavailablePage"
 components:
   schemas:
+    SubmitForm:
+      type: object
+      required: [submission]
+      properties:
+        submission:
+          type: string
+          description: The entry text. Stored exactly as sent.
+    UpdateForm:
+      type: object
+      required: [update]
+      properties:
+        update:
+          type: string
+          description: The new entry text. Stored exactly as sent.
     SavedEntry:
       type: object
       required: [id, created_at]
@@ -93,10 +248,52 @@ components:
           type: string
           format: date-time
           description: Creation instant in UTC.
+    UpdatedEntry:
+      type: object
+      required: [id, updated_at]
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        updated_at:
+          type: string
+          format: date-time
+          description: Update instant in UTC.
     Error:
       type: object
       required: [error]
       properties:
         error:
           type: string
-          enum: [empty_text, store_unavailable]
+          enum: [empty_text, not_found, store_unavailable]
+  responses:
+    EmptyText:
+      description: The text is whitespace only. Nothing is stored. The page keeps the typed text.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+        text/html:
+          schema:
+            type: string
+    StoreUnavailable:
+      description: The entry store failed. Nothing is stored. The page keeps the typed text.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+        text/html:
+          schema:
+            type: string
+    StoreUnavailablePage:
+      description: The entry store failed. The page shows a message.
+      content:
+        text/html:
+          schema:
+            type: string
+    NotFoundPage:
+      description: No entry has this id. The page has the heading "Entry not found."
+      content:
+        text/html:
+          schema:
+            type: string
