@@ -22,8 +22,10 @@ Shared files: `glossary.md` (one term per meaning) and `traceability.md`
    The stack appears only in `implementations/<stack>/` and in the ADR that adds that implementation.
 3. Each implementation runs the same `features/*.feature` files with its own BDD runner.
    The step text is the contract. Implementations add step bindings, not scenarios.
-4. Each implementation passes the same OpenAPI contract and the same export format grammar.
-5. The legacy implementation is a reference only. It does not have to pass this spec.
+4. A scenario tagged `@manual` checks browser behaviour that a domain-level runner cannot check.
+   The runner skips it. A person checks it in a browser. `traceability.md` records the check.
+5. Each implementation passes the same OpenAPI contract and the same export format grammar.
+6. The legacy implementation is a reference only. It does not have to pass this spec.
 
 ## ID scheme
 

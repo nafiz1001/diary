@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diary</title>
+</head>
+<body>
+<main>
+  <h1>Diary</h1>
+  <div id="submission-status" role="{{.Role}}"{{with .Reason}} data-reason="{{.}}"{{end}}>{{.Message}}</div>
+  <form id="index-form" method="post" action="/">
+    <label for="submission">Entry</label>
+    <textarea id="submission" name="submission" rows="8"{{if .Reason}} autofocus{{end}}>
+{{.Text}}</textarea>
+    <button id="submission-button" type="submit">Submit</button>
+  </form>
+</main>
+<script src="/static/js/main.js" defer></script>
+</body>
+</html>

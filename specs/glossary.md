@@ -10,4 +10,14 @@ One term has one meaning. Add terms here before other files use them.
 | Requirement | One testable statement in EARS form with a `REQ-` ID. |
 | Scenario | One Gherkin example that checks a requirement. |
 | ADR | Architecture decision record. One file per decision. |
-| Entry | One diary note with text and a creation instant. |
+| User | The one person who uses the diary. |
+| Diary | The set of all entries. |
+| Entry | One diary note with an id, text and a creation instant. |
+| Entry text | The words of an entry, kept exactly as the user entered them. |
+| Whitespace only | A text that has no character other than space, tab, carriage return and line feed. An empty text is also whitespace only. |
+| Instant | A point in time, stored in UTC. |
+| Creation instant | The Instant when the system stored the entry. |
+| Display zone | The time zone used to show an Instant to the user. Default `America/Montreal`. |
+| Submission | The act of the user sending entry text to the system to create an entry. |
+| Entry store | The place where the system keeps entries. |
+| Form | The page element where the user types entry text. |

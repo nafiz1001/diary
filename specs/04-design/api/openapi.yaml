@@ -1,0 +1,102 @@
+openapi: 3.1.0
+info:
+  title: Diary
+  version: 0.1.0
+  description: HTTP contract of the diary. Version 0.1.0 covers the submit page only.
+paths:
+  /:
+    get:
+      summary: Show the submit page
+      operationId: showSubmitPage
+      parameters:
+        - name: saved
+          in: query
+          required: false
+          description: When `1`, the page shows the message "Entry saved."
+          schema:
+            type: string
+            enum: ["1"]
+      responses:
+        "200":
+          description: The submit page with an empty form.
+          content:
+            text/html:
+              schema:
+                type: string
+    post:
+      summary: Submit an entry
+      operationId: submitEntry
+      description: |
+        Requirements REQ-SUB-001 to REQ-SUB-006.
+        Without `Accept: application/json` the system answers with pages and a redirect.
+        With it, the system answers with JSON.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [submission]
+              properties:
+                submission:
+                  type: string
+                  description: The entry text. Stored exactly as sent.
+          multipart/form-data:
+            schema:
+              type: object
+              required: [submission]
+              properties:
+                submission:
+                  type: string
+      responses:
+        "201":
+          description: Entry saved (JSON request).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavedEntry"
+        "303":
+          description: Entry saved (page request). Redirects to the submit page.
+          headers:
+            Location:
+              schema:
+                type: string
+                const: /?saved=1
+        "422":
+          description: The text is whitespace only. Nothing is stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+            text/html:
+              schema:
+                type: string
+        "503":
+          description: The entry store failed. Nothing is stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+            text/html:
+              schema:
+                type: string
+components:
+  schemas:
+    SavedEntry:
+      type: object
+      required: [id, created_at]
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+          description: Creation instant in UTC.
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum: [empty_text, store_unavailable]
