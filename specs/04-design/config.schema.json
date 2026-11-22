@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nafiz1001/diary/specs/04-design/config.schema.json",
+  "title": "Diary configuration",
+  "description": "The three configuration keys of the system (specs/02-specification/technical-spec.md, section Configuration). A document of this form is the logical configuration. An implementation reads each key from a command-line option or an environment variable and chooses the names.",
+  "type": "object",
+  "properties": {
+    "database_location": {
+      "description": "Path of the entry store file (REQ-NFR-004).",
+      "type": "string",
+      "minLength": 1,
+      "default": "diary.db"
+    },
+    "display_zone": {
+      "description": "Name of the display zone, from the IANA time zone database (REQ-NFR-002). The system stops at start if the name is unknown. A schema cannot check the name against the database.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_+\\-]+(/[A-Za-z0-9_+\\-]+)*$",
+      "default": "America/Montreal"
+    },
+    "listen_address": {
+      "description": "Host and port where the system accepts requests. The default is a local address because the system has no sign-in (risk R-5).",
+      "type": "string",
+      "pattern": "^(\\[[0-9A-Fa-f:.]+\\]|[^:\\s\\[\\]]+):[0-9]{1,5}$",
+      "default": "127.0.0.1:8000"
+    }
+  },
+  "additionalProperties": false
+}

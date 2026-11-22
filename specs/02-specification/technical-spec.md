@@ -11,6 +11,8 @@ Rules that apply to every feature. Functional behaviour is in `functional-spec.m
 | `listen_address` | Host and port where the system accepts requests. | `127.0.0.1:8000` | (deployment) |
 
 A key is set by a command-line option or an environment variable. The implementation chooses the names.
+The machine-readable form of the keys, the types and the defaults is `../04-design/config.schema.json`.
+The operator guide (`../../docs/operator-guide.md`) explains how to use them.
 An unknown `display_zone` stops the system at start with an error that names the key.
 
 ## Time rules
@@ -118,6 +120,16 @@ File names and media types:
 | Markdown | `diary.md` | `text/markdown` |
 | Tab-separated | `diary.tsv` | `text/tab-separated-values` |
 
+## Store rules
+
+| ID | Rule |
+|----|------|
+| TS-STORE-1 | The schema version of this spec is 1. The next change of the schema makes it 2. |
+| TS-STORE-2 | The store records its schema version in the table `schema_version` (`../04-design/data/schema.sql`). |
+| TS-STORE-3 | At start, the system and the Import tool run the start-up check (`../04-design/lld.md`, section 1.7) before any other use of the store. |
+| TS-STORE-4 | A migration step goes from version n to version n + 1. The system applies the steps in order in one transaction. |
+| TS-STORE-5 | A backup is a copy of the store file and of each file with the same name prefix, made while the system is stopped (ADR-0009). |
+
 ## Legacy store format (for the import)
 
 | Item | Rule |
@@ -164,6 +176,10 @@ Details of the import are in `functional-spec.md` (UC-IMP) and, from phase 5, `.
 22. `the user enters "T" and sends the form` replaces the text in the entry text control with T, then sends the form.
 23. `the page has not changed` means the user interface did not load a new page: the rest of the page stays as it was.
 24. A page state in an Examples table (for example `export page after a request with no date`) names how to reach that state. It starts from an empty diary unless it says other.
+25. `Given a store with schema version N` makes a new entry store that records the schema version N and holds no entry. Steps that add entries (`the diary has N numbered entries`) then add them to this store.
+26. `Given the system knows schema version N` sets the schema version that the system knows to N. The default is 1 (TS-STORE-1). When N is above 1, the runner gives the system one migration step from each version below N. A step changes the recorded version and no entry.
+27. `Given the migration to schema version N fails` makes the migration step to version N fail after it changed the store.
+28. `When the system starts` runs the start-up check on the store, as the system does at start. `Then the system starts` means the check ends with no refusal. `Then the system does not start with the reason "R"` means the check refuses with the reason code R. `And the message names schema version N` means the refusal message holds N. `And the store has schema version N` reads the recorded version. `And the store is unchanged` means the recorded version and every entry equal their values before the start.
 
 ## Page reading by runners
 

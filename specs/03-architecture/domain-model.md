@@ -139,6 +139,7 @@ Every refusal has a reason code. The codes are the contract between the layers.
 | `store_unavailable` | Any use of the Diary |
 | `invalid_date`, `invalid_format` | Export |
 | `target_not_empty`, `legacy_unreadable`, `legacy_table_missing`, `entry_invalid`, `target_unavailable` | Legacy import |
+| `schema_too_new`, `migration_failed` | Store start-up check (the system and the Import tool) |
 
 ## Decision
 

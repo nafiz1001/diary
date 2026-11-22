@@ -86,6 +86,35 @@ A writer does not fail on content. Every character has a defined output.
 Steps and reasons are in `../02-specification/functional-spec.md` (UC-IMP) and `data/legacy-import.md`.
 The tool uses the Entry repository schema and one transaction on the new store.
 
+### 1.7 Start-up check
+
+| Operation | Input | Output |
+|-----------|-------|--------|
+| `openStore(location, knownVersion, steps)` | path, integer, migration steps | `Ready`, or `Refused(reason, version)` |
+
+The system and the Import tool call `openStore` before any other use of the store (TS-STORE-3).
+
+```
+openStore(location, knownVersion, steps):
+    open the file at location, create it if it does not exist
+    if the store has no table "entries":
+        in one transaction: create the schema, set the version row to knownVersion
+        return Ready
+    v = the version in schema_version
+    if v == knownVersion: return Ready
+    if v > knownVersion:  return Refused(schema_too_new, v)      # no change
+    begin transaction
+    for n from v to knownVersion - 1:
+        apply steps[n]                                           # goes from n to n + 1
+        set the version row to n + 1
+        on failure: roll back; return Refused(migration_failed, v)
+    commit
+    return Ready
+```
+
+The caller reports the reason code and the version, and ends. It never serves a request on a refused store.
+An implementation names the parts of this operation as it likes.
+
 ## 2. Algorithms (pseudocode)
 
 ### 2.1 Whitespace only (BR-SUB-1, TS-TEXT-3)
@@ -335,7 +364,7 @@ sequenceDiagram
     participant N as New store
     participant L as Legacy file
     Operator->>T: diary-import legacy-file
-    T->>N: open, create schema if new
+    T->>N: start-up check (1.7), create schema if new
     T->>N: count()
     alt new store has an entry
         T-->>Operator: refused: target_not_empty (exit 2)
@@ -366,4 +395,4 @@ sequenceDiagram
 
 REQ-SUB-001 to REQ-SUB-006 (1.3, 2.1, 3, 4.1). REQ-BRW-001 to REQ-BRW-009 (1.2, 2.2, 2.3, 3).
 REQ-UPD-001 to REQ-UPD-008 (1.2, 1.3, 3, 4.2). REQ-EXP-001 to REQ-EXP-010 (1.4, 2.3 to 2.7, 3, 4.3).
-REQ-IMP-001 to REQ-IMP-007 (1.6, 4.4). REQ-NFR-001 to REQ-NFR-006 (1.1, 1.2, 1.4, 3).
+REQ-IMP-001 to REQ-IMP-007 (1.6, 4.4). REQ-NFR-001 to REQ-NFR-006 (1.1, 1.2, 1.4, 3). REQ-NFR-008 to REQ-NFR-010 (1.7, ADR-0009).

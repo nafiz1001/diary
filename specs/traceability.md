@@ -2,6 +2,7 @@
 
 Requirement to scenario to design element to test. One test column per implementation, named by the ADR that adds it.
 The `@frontend` scenarios added by ADR-0008 are not checked yet for the implementation of ADR-0006 (risk R-9 in arc42).
+Spec version of this file: 1.1.0 (ADR-0010). Spec version passed by the implementation of ADR-0006: 1.0.0. It does not pass 1.1.0, because REQ-NFR-008 to REQ-NFR-010 are not implemented (risk R-10 in arc42).
 
 Test column key: `bdd` = scenario in `features/` run by the BDD runner. `contract` = OpenAPI contract test. `manual` = `@manual` scenario checked in a browser by a person. `frontend` = `@frontend` scenario run by a frontend runner (ADR-0008).
 
@@ -54,6 +55,9 @@ Test column key: `bdd` = scenario in `features/` run by the BDD runner. `contrac
 | REQ-NFR-005 | update.feature: A store failure keeps the text and shows no success<br>form-script.feature: A store failure keeps the text and moves the focus to it (outline) | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR; arc42 section 10; domain INV-6, INV-9; lld 1.1 | bdd ; manual: `@frontend` scenarios not checked (R-9) |
 | REQ-NFR-006 | browse.feature: A page of a large diary arrives quickly `@manual` | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR; arc42 section 10; domain INV-6, INV-9; lld 1.1 | manual: checked with 100000 entries: viewer page 5 ms, update page under 1 ms, full export (15 MB) 0.26 s |
 | REQ-NFR-007 | accessibility.feature: Every page state meets the page-wide rules (outline)<br>accessibility.feature: Every form control has a visible linked label (outline)<br>accessibility.feature: Messages are announced (outline)<br>accessibility.feature: After an error the focus is on the control to fix (outline)<br>accessibility.feature: Every task works with the keyboard only<br>accessibility.feature: Every task works with no optional behaviour<br>accessibility.feature: The entry table has column headers<br>accessibility.feature: Entry text keeps its line breaks and spaces and wraps | ui-ux accessibility rules 1 to 8, marker index ; technical-spec TS-RUN, step conventions 16 to 24 | manual: `@frontend` scenarios not checked (R-9) |
+| REQ-NFR-008 | store.feature: A new store records the schema version<br>store.feature: The schema version stays when the system starts again on the same store | ADR-0009; technical-spec TS-STORE-1..5, step conventions 25 to 28; schema `schema_version`; lld 1.7; arc42 sections 7 and 11; operator guide sections 4 and 5 | not implemented (R-10) |
+| REQ-NFR-009 | store.feature: A store with a newer schema version is refused and not changed | ADR-0009; technical-spec TS-STORE-1..5, step conventions 25 to 28; schema `schema_version`; lld 1.7; arc42 sections 7 and 11; operator guide sections 4 and 5 | not implemented (R-10) |
+| REQ-NFR-010 | store.feature: A store with an older schema version is migrated<br>store.feature: A failed migration leaves the store unchanged | ADR-0009; technical-spec TS-STORE-1..5, step conventions 25 to 28; schema `schema_version`; lld 1.7; arc42 sections 7 and 11; operator guide sections 4 and 5 | not implemented (R-10) |
 
 ## Verification status
 
@@ -64,10 +68,12 @@ Test column key: `bdd` = scenario in `features/` run by the BDD runner. `contrac
 | Mermaid diagrams render | Done (browser preview, 13 diagrams) |
 | All scenarios pass in the implementation of ADR-0006 | Done (the implementation test command, `@manual` skipped) |
 | Contract test against `api/openapi.yaml` | Done (loads and validates the file, checks 30 requests and responses) |
-| OpenAPI lint with a dedicated linter | **Not run.** Skipped by decision in the phase 6 review. Run it before a second implementation relies on the file. |
+| OpenAPI lint with a dedicated linter | **Not run.** Skipped by decision in the phase 6 review. Run it before a second implementation relies on the file. The workflow `.github/workflows/spec-checks.yml` runs it (ADR-0010 context, risk R-8). Record the result here after the first green run. |
 | Import on a copy of real data | Done on a legacy store made by the legacy app (37 rows, 0 mismatches). Not yet on the real legacy store file. |
 | `@frontend` scenarios checked (ADR-0008) | **Not done** for the implementation of ADR-0006 (R-9). The double send scenarios were checked before (see REQ-SUB-004, REQ-UPD-006). |
 | Runners read pages by markers (TS-RUN) | **Not done** for the implementation of ADR-0006. Its runner uses text patterns over the markup (R-9). |
+| Spec checks workflow (`.github/workflows/spec-checks.yml`) | Written. Every check passed locally (tag and row cross-check 50 of 50, names grep, schema, 13 diagrams rendered, Gherkin lint, OpenAPI lint with 0 errors and 4 warnings). **Not run in CI yet.** Record the first CI result here. |
+| New scenarios of `store.feature` (REQ-NFR-008 to REQ-NFR-010) | **Not implemented** in the implementation of ADR-0006 (R-10). |
 | Browser check against the legacy app | Done: the viewer shows the same rows and times. Exports differ only by the intended changes (see below). |
 
 Intended differences from legacy, found in the comparison:
@@ -75,4 +81,3 @@ Intended differences from legacy, found in the comparison:
 1. Tab-separated export: legacy ends lines with CRLF and quotes a field that holds a double quote. The new export ends lines with LF (TS-EXP-1) and quotes nothing (REQ-EXP-007).
 2. Escaping of backslash and (Markdown only) the pipe character (REQ-EXP-006, REQ-EXP-007).
 3. Legacy rejects only the exactly empty text. It stores whitespace-only text (REQ-SUB-002, REQ-UPD-004).
-

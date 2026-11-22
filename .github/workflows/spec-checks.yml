@@ -1,0 +1,156 @@
+# Automated checks of the Definition of Done for specs/ (specs/README.md, test-strategy.md).
+# Every step is inline. The workflow runs no implementation.
+name: spec-checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  openapi-lint:
+    name: OpenAPI lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lint the OpenAPI file
+        # Fail on errors. Warnings are printed and do not fail the job.
+        run: |
+          printf 'extends: ["spectral:oas"]\n' > "$RUNNER_TEMP/spectral.yaml"
+          npx --yes @stoplight/spectral-cli@6.17.1 lint \
+            --ruleset "$RUNNER_TEMP/spectral.yaml" \
+            --fail-severity=error \
+            specs/04-design/api/openapi.yaml
+
+  gherkin-lint:
+    name: Gherkin lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lint the feature files
+        # no-dupe-scenario-names is off: two features may share a scenario name.
+        run: |
+          cat > "$RUNNER_TEMP/gherkin-lint.json" <<'JSON'
+          {
+            "no-empty-file": "on",
+            "no-unnamed-features": "on",
+            "no-unnamed-scenarios": "on",
+            "no-dupe-feature-names": "on",
+            "no-scenario-outlines-without-examples": "on",
+            "no-unused-variables": "on",
+            "no-trailing-spaces": "on",
+            "no-multiple-empty-lines": "on",
+            "one-space-between-tags": "on",
+            "new-line-at-eof": ["on", "yes"]
+          }
+          JSON
+          npx --yes gherkin-lint@4.2.4 --config "$RUNNER_TEMP/gherkin-lint.json" specs/features/*.feature
+
+  mermaid-render:
+    name: Mermaid render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install the Mermaid CLI
+        run: npm install --global @mermaid-js/mermaid-cli@12.2.0
+      - name: Render every Mermaid block
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/mermaid"
+          mkdir -p "$work"
+          # The runner needs no sandbox for the headless browser.
+          echo '{"args": ["--no-sandbox"]}' > "$work/puppeteer.json"
+          count=0
+          while IFS= read -r file; do
+            # Write each fenced block to its own file: <name>-<n>.mmd
+            awk -v out="$work/$(echo "$file" | tr '/' '_')" '
+              /^```mermaid[[:space:]]*$/ { n++; f = out "-" n ".mmd"; inblock = 1; next }
+              /^```[[:space:]]*$/ && inblock { inblock = 0; close(f); next }
+              inblock { print > f }
+            ' "$file"
+          done < <(grep -rlE '^```mermaid' specs docs README.md || true)
+          for mmd in "$work"/*.mmd; do
+            [ -e "$mmd" ] || { echo "No Mermaid block found" >&2; exit 1; }
+            echo "Render $mmd"
+            mmdc --puppeteerConfigFile "$work/puppeteer.json" --input "$mmd" --output "${mmd%.mmd}.svg"
+            count=$((count + 1))
+          done
+          echo "Rendered $count Mermaid blocks"
+
+  traceability:
+    name: Tags and traceability
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cross-check requirement IDs, scenario tags and traceability rows
+        run: |
+          set -euo pipefail
+          # A requirement row that says "Withdrawn" needs no tag and no row.
+          grep -v 'Withdrawn' specs/01-requirements/requirements.md \
+            | grep -oE '^\| REQ-[A-Z]+-[0-9]{3}' | sed 's/^| //' | sort -u > "$RUNNER_TEMP/req.txt"
+          grep -ohE '@REQ-[A-Z]+-[0-9]{3}' specs/features/*.feature | sed 's/^@//' | sort -u > "$RUNNER_TEMP/tags.txt"
+          grep -oE '^\| REQ-[A-Z]+-[0-9]{3}' specs/traceability.md | sed 's/^| //' | sort -u > "$RUNNER_TEMP/trace.txt"
+          echo "Requirements: $(wc -l < "$RUNNER_TEMP/req.txt")"
+          status=0
+          check() {
+            if [ -n "$(comm -23 "$1" "$2")" ]; then
+              echo "::error::$3"; comm -23 "$1" "$2"; status=1
+            fi
+          }
+          check "$RUNNER_TEMP/req.txt"   "$RUNNER_TEMP/tags.txt"  "Requirements with no scenario tag:"
+          check "$RUNNER_TEMP/tags.txt"  "$RUNNER_TEMP/req.txt"   "Scenario tags with no requirement:"
+          check "$RUNNER_TEMP/req.txt"   "$RUNNER_TEMP/trace.txt" "Requirements with no traceability row:"
+          check "$RUNNER_TEMP/trace.txt" "$RUNNER_TEMP/req.txt"   "Traceability rows with no requirement:"
+          exit "$status"
+
+  no-language-names:
+    name: No language or framework names in specs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Search specs for stack names (ADR-0006 is the one allowed place)
+        run: |
+          set -uo pipefail
+          words='python|golang|typescript|javascript|node\.?js|java|rust|ruby|php|django|flask|fastapi|react|vue|angular|sqlite|postgres(ql)?|mysql|mariadb|godog|cucumber|pytest|jinja2?|uvicorn|pydantic|sqlalchemy|behave|pgx|chromium|puppeteer|playwright|selenium|npm|webpack'
+          found=0
+          grep -rniwE "$words" specs --exclude=0006-go-implementation.md && found=1
+          grep -rnE '\bGo\b' specs --exclude=0006-go-implementation.md && found=1
+          grep -rniE 'html/template|net/http|\bpip\b|\bgo (test|run|build)\b' specs --exclude=0006-go-implementation.md && found=1
+          if [ "$found" -ne 0 ]; then
+            echo "::error::A spec file names a language, framework or library. Only ADR-0006 may."
+            exit 1
+          fi
+
+  config-schema:
+    name: Configuration JSON Schema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate the schema and its defaults
+        run: |
+          set -euo pipefail
+          schema=specs/04-design/config.schema.json
+          npx --yes ajv-cli@5.0.0 compile --spec=draft2020 --strict=true -s "$schema"
+          # The defaults in the schema must be the defaults of technical-spec.md and must validate.
+          printf '{"database_location":"diary.db","display_zone":"America/Montreal","listen_address":"127.0.0.1:8000"}\n' > "$RUNNER_TEMP/defaults.json"
+          npx --yes ajv-cli@5.0.0 validate --spec=draft2020 --strict=true -s "$schema" -d "$RUNNER_TEMP/defaults.json"
+          for key in database_location display_zone listen_address; do
+            value=$(jq -r ".properties.$key.default" "$schema")
+            [ "$value" = "$(jq -r ".$key" "$RUNNER_TEMP/defaults.json")" ] || { echo "::error::Default of $key differs"; exit 1; }
+          done

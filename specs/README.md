@@ -1,5 +1,7 @@
 # Diary specification
 
+Version: 1.1.0 (ADR-0010). Changes: [`../CHANGELOG.md`](../CHANGELOG.md).
+
 This folder holds the layered, language-agnostic specification of the diary.
 Each implementation in `implementations/<stack>/` is generated from it.
 
@@ -12,8 +14,8 @@ Each implementation in `implementations/<stack>/` is generated from it.
 | 3 Architecture (HLD) | `03-architecture/` | Domain model, C4, arc42, ADRs | Markdown, Mermaid, MADR |
 | 4 Design (UI/UX, LLD) | `04-design/` | Wireframes, contracts, API, schema | Markdown, OpenAPI 3.1, standard SQL |
 
-Shared files: `glossary.md` (one term per meaning) and `traceability.md`
-(requirement to scenario to design element to test).
+Shared files: `glossary.md` (one term per meaning), `traceability.md`
+(requirement to scenario to design element to test) and `test-strategy.md` (how the spec is verified).
 
 ## Language-agnostic rules
 
@@ -29,6 +31,18 @@ Shared files: `glossary.md` (one term per meaning) and `traceability.md`
 7. A scenario tagged `@frontend` checks the user interface (ADR-0008). It is also tagged `@manual`, so by default a person checks it.
    An implementation may bind its steps and run it with a frontend runner. Then `traceability.md` records `frontend` instead of `manual`.
 8. A runner that reads pages follows TS-RUN in `02-specification/technical-spec.md`.
+
+## Version
+
+The spec has one version, `MAJOR.MINOR.PATCH` (ADR-0010).
+
+| Part | Change |
+|------|--------|
+| Major | A scenario changes or is removed, or the contract changes (OpenAPI, export grammar, schema that needs a migration of data). |
+| Minor | A requirement or a scenario is added. |
+| Patch | Wording only. |
+
+Version 1.0.0 is the state at commit `5555a3f`. Each change sets the version and adds an entry in `../CHANGELOG.md`.
 
 ## ID scheme
 
@@ -53,6 +67,7 @@ Shared files: `glossary.md` (one term per meaning) and `traceability.md`
 2. Update the scenarios, state machines and design.
 3. If a decision changes, add an ADR. Do not edit an accepted ADR. Supersede it.
 4. Change each implementation until all scenarios pass.
+5. Set the new spec version in this file, add the entry in `../CHANGELOG.md` and record the version that each implementation passes in `traceability.md`.
 
 If code needs behaviour that the spec does not define, stop and update the spec first.
 

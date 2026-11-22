@@ -81,3 +81,6 @@ The operator runs the import from a command-line tool. The import runs once.
 | REQ-NFR-005 | Ubiquitous | The system shall confirm a write to the user only after the entry store holds it. |
 | REQ-NFR-006 | State-driven | While the diary holds 100000 entries, the system shall answer a request for any page in less than 1 second on a personal machine. |
 | REQ-NFR-007 | Ubiquitous | The system shall meet the accessibility rules of the UI/UX design (`04-design/ui-ux.md`, section Accessibility) on every page. |
+| REQ-NFR-008 | Ubiquitous | The system shall record the schema version in the entry store. |
+| REQ-NFR-009 | Unwanted behaviour | If the schema version of the entry store is newer than the schema version that the system knows, then the system shall not start, shall name the schema version of the store and shall change nothing in the store. |
+| REQ-NFR-010 | Event-driven | When the system starts on an entry store with an older schema version, the system shall migrate the store to the schema version that it knows in one transaction, or leave the store unchanged. |

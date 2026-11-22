@@ -38,3 +38,5 @@ One term has one meaning. Add terms here before other files use them.
 | Legacy store | The entry store file of the legacy implementation. |
 | Operator | The user, when the user runs the import tool. |
 | Import | The one-time copy of all legacy entries into the new store. |
+| Schema version | The whole number that the entry store records. It names the form of the schema in the store (ADR-0009). |
+| Backup | A copy of the entry store file, and of the files with the same name prefix, made while the system is stopped. |

@@ -82,6 +82,15 @@ The Import tool is a separate short-lived process that runs once.
 
 The system listens on the local address by default because it has no sign-in.
 
+Backup and upgrade (ADR-0009, `../../docs/operator-guide.md`):
+
+| Item | Rule |
+|------|------|
+| Backup | Stop the system. Copy the Entry store file and each file with the same name prefix (TS-STORE-5). |
+| Restore | Stop the system. Replace the files with the backup. Start the system. |
+| Upgrade | Back up. Install the new version. Start. The system migrates an older store in one transaction and refuses a newer store (REQ-NFR-009, REQ-NFR-010). |
+| Schema version | Recorded in the table `schema_version` of the Entry store (REQ-NFR-008). |
+
 ## 8. Crosscutting concepts
 
 | Concept | Rule |
@@ -90,7 +99,7 @@ The system listens on the local address by default because it has no sign-in.
 | Text | Unchanged in the store. Plain text on pages. Escaped in exports (TS-TEXT-*, escape table). |
 | Errors | Each refusal has a reason code (`domain-model.md`). Pages show a message and keep the user's input. |
 | Configuration | Three keys (`../02-specification/technical-spec.md`). |
-| Security | One local user, no sign-in. Entry text is never read as markup (REQ-NFR-003). The default listen address is local. |
+| Security | One local user, no sign-in. Entry text is never read as markup (REQ-NFR-003). The default listen address is local. Threats and gaps: `threat-model.md`. |
 | Transactions | One transaction per change. The import is one transaction. |
 | Progressive enhancement | Every flow works with no script. The script only blocks double sends and shows status (ADR-0004). |
 
@@ -106,6 +115,10 @@ The system listens on the local address by default because it has no sign-in.
 | 0006 | First spec-generated implementation (stack named in the ADR) |
 | 0007 | New schema and one-time legacy import |
 | 0008 | Frontend checks as manual Gherkin scenarios |
+| 0009 | Schema version recorded in the store, forward migration at start, backup by file copy |
+| 0010 | Semantic Versioning of the spec, root changelog |
+
+Version of the spec: see `../README.md` (ADR-0010). Changes: `../../CHANGELOG.md`.
 
 ## 10. Quality requirements
 
@@ -135,8 +148,13 @@ Quality tree: correctness, performance, portability, usability, accessibility.
 | R-5 | No sign-in. Anyone who reaches the address can read the diary. | Listen on a local address by default. |
 | R-6 | The first slice has a schema with no `updated_at`. | Phase 5 completes the schema. Phase 6 changes the first implementation. |
 | R-7 | The legacy store file is not in the repository, so the import test needs a copy from the user. | Ask the user for a copy in phase 6. |
-| R-8 | The OpenAPI file has not been checked with a dedicated linter. A library loads and validates it in the contract test. | Run a linter before a second implementation relies on the file. |
+| R-8 | The OpenAPI file has not been checked with a dedicated linter. A library loads and validates it in the contract test. | Run a linter before a second implementation relies on the file. The workflow `.github/workflows/spec-checks.yml` runs one. Close this risk after the first green run. |
 | R-9 | The implementation of ADR-0006 reads pages with text patterns over the markup (breaks TS-RUN). No check of the new `@frontend` scenarios is recorded. | Change its runner to a document parser and check the `@frontend` scenarios in a follow-up task. |
+| R-10 | The implementation of ADR-0006 does not implement REQ-NFR-008 to REQ-NFR-010 (schema version, refusal of a newer store, migration). It passes spec version 1.0.0 only. | Implement them in a separate task, with the step bindings of conventions 25 to 28. Until then `traceability.md` shows "not implemented". |
+| R-11 | Threat T-01: a page from another site can make the browser send a write request. The system has no origin check and no form token. | Operator guide: open the diary only in a browser that you trust. Follow-up requirement in `threat-model.md`. |
+| R-12 | Threat T-02: DNS rebinding can let a page from another site read the diary through the local listener. The system has no host name check. | Same as R-11. |
+| R-13 | Threat T-04: the Entry store file and the backups are not encrypted and the system sets no file permissions. | Operator guide: restrict the files to the own account. Follow-up requirement in `threat-model.md`. |
+| R-14 | Threat T-07: there is no maximum size of a submitted text (TS-TEXT-4). A very large request can use all memory. | Accepted for one local user. Follow-up requirement in `threat-model.md`. |
 
 ## 12. Glossary
 
