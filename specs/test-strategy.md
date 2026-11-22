@@ -88,7 +88,7 @@ A manual check records the date, the person or the runner, and the result.
 
 | Item | Status | Source |
 |------|--------|--------|
-| R-8 OpenAPI lint | The workflow runs a linter. Close after the first green run. | `03-architecture/arc42.md` |
+| R-8 OpenAPI lint | Closed. The workflow lints the file and the first run was green. | `03-architecture/arc42.md` |
 | R-9 Page reading by text patterns, `@frontend` scenarios not checked | Open | `03-architecture/arc42.md` |
 | R-10 REQ-NFR-008 to REQ-NFR-010 not implemented | Open | `03-architecture/arc42.md` |
 | Import on a copy of the real legacy store | Open (R-7) | `traceability.md` |

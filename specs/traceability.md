@@ -68,11 +68,11 @@ Test column key: `bdd` = scenario in `features/` run by the BDD runner. `contrac
 | Mermaid diagrams render | Done (browser preview, 13 diagrams) |
 | All scenarios pass in the implementation of ADR-0006 | Done (the implementation test command, `@manual` skipped) |
 | Contract test against `api/openapi.yaml` | Done (loads and validates the file, checks 30 requests and responses) |
-| OpenAPI lint with a dedicated linter | **Not run.** Skipped by decision in the phase 6 review. Run it before a second implementation relies on the file. The workflow `.github/workflows/spec-checks.yml` runs it (ADR-0010 context, risk R-8). Record the result here after the first green run. |
+| OpenAPI lint with a dedicated linter | Done in CI: `spec-checks` run 1 on commit `58c73b3`, 0 errors and 4 warnings (R-8 closed). |
 | Import on a copy of real data | Done on a legacy store made by the legacy app (37 rows, 0 mismatches). Not yet on the real legacy store file. |
 | `@frontend` scenarios checked (ADR-0008) | **Not done** for the implementation of ADR-0006 (R-9). The double send scenarios were checked before (see REQ-SUB-004, REQ-UPD-006). |
 | Runners read pages by markers (TS-RUN) | **Not done** for the implementation of ADR-0006. Its runner uses text patterns over the markup (R-9). |
-| Spec checks workflow (`.github/workflows/spec-checks.yml`) | Written. Every check passed locally (tag and row cross-check 50 of 50, names grep, schema, 13 diagrams rendered, Gherkin lint, OpenAPI lint with 0 errors and 4 warnings). **Not run in CI yet.** Record the first CI result here. |
+| Spec checks workflow (`.github/workflows/spec-checks.yml`) | Done: all 6 jobs green in CI, run 1 on commit `58c73b3`. |
 | New scenarios of `store.feature` (REQ-NFR-008 to REQ-NFR-010) | **Not implemented** in the implementation of ADR-0006 (R-10). |
 | Browser check against the legacy app | Done: the viewer shows the same rows and times. Exports differ only by the intended changes (see below). |
 
