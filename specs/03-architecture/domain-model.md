@@ -46,7 +46,7 @@ classDiagram
 | Element | Meaning | Rules |
 |---------|---------|-------|
 | Entry | One diary note. | Has a unique id. Id never changes (REQ-UPD-008). |
-| EntryText | The words of an entry. | Never empty and never whitespace only. Kept exactly as entered. |
+| EntryText | The words of an entry. | Never empty and never whitespace only when the user submits or updates it. Kept exactly as entered. An imported legacy entry may break the first rule (TS-TEXT-5). |
 | Instant | A point in time. | Stored in UTC (REQ-NFR-001). |
 | createdAt | Instant when the entry was first stored. | Set once. Never changes (REQ-UPD-008). |
 | updatedAt | Instant of the last change of the text. | Equals `createdAt` until the first update. Set by each update (REQ-UPD-002). |

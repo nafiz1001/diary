@@ -1,55 +1,55 @@
 # Traceability
 
 Requirement to scenario to design element to test. One test column per implementation, named by the ADR that adds it.
-Rows for the other areas arrive in phases 2 to 6.
+The scenario column is complete. The test column of the implementation is filled in phase 6.
 
 Test column key: `bdd` = scenario in `features/` run by the BDD runner. `contract` = OpenAPI contract test. `manual` = checked in a browser.
 
-| Requirement | Scenario (`features/submit.feature`) | Design element | Implementation of ADR-0006 |
-|-------------|--------------------------------------|----------------|-------------|
+| Requirement | Scenarios | Design element | Implementation of ADR-0006 |
+|-------------|-----------|----------------|-----------------------------|
 | REQ-SUB-001 | A valid text becomes an entry with the current time | functional-spec UC-SUB, BR-SUB-3, TS-TIME-1..4, lld submit rule, openapi `POST /`, schema `entries` | bdd, contract |
 | REQ-SUB-002 | A whitespace-only text is rejected (outline) | BR-SUB-1, TS-TEXT-3, lld `isWhitespaceOnly`, openapi 422 | bdd, contract |
 | REQ-SUB-003 | A saved entry clears the form and confirms | ui-ux messages, lld HTTP outcomes, openapi 303 and `saved` | bdd, contract |
 | REQ-SUB-004 | A second send is blocked while the first is in progress (`@manual`) | ui-ux form state machine | manual |
 | REQ-SUB-005 | The text is stored exactly as entered (outline) | BR-SUB-2, TS-TEXT-1, TS-TEXT-2 | bdd |
 | REQ-SUB-006 | A store failure keeps the text | functional-spec alternative 5a, lld HTTP outcomes, openapi 503 | bdd, contract |
-| REQ-BRW-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-008 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-BRW-009 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-UPD-008 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-008 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-009 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-EXP-010 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-IMP-007 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-NFR-001 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-NFR-002 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-NFR-003 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-NFR-004 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-NFR-005 | (phase 3) | (phases 4 and 5) | (phase 6) |
-| REQ-NFR-006 | (phase 3) | (phases 4 and 5) | (phase 6) |
+| REQ-BRW-001 | browse.feature: Entries are listed newest first<br>browse.feature: Entries with the same instant are ordered by id, highest first | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-002 | browse.feature: The viewer uses the default limit and offset | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-003 | browse.feature: The creation instant is shown in the display zone (outline)<br>browse.feature: Line breaks and spaces of the text are kept<br>browse.feature: Each entry links to its update page | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-004 | browse.feature: A limit or offset out of range is clamped before entries are read (outline)<br>browse.feature: The offset of an empty diary is 0 | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-005 | browse.feature: The total is shown on every page | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-006 | browse.feature: The next page link shows only while more entries follow (outline) | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-007 | browse.feature: The latest and previous links show only away from offset 0 (outline) | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-008 | browse.feature: The user sets limit and offset in the viewer controls | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-BRW-009 | browse.feature: An empty diary shows a message and no paging links | functional-spec UC-BRW, TS-PAGE-1..7 | (phase 6) |
+| REQ-UPD-001 | update.feature: The update page holds the current text | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-002 | update.feature: A valid text replaces the old text<br>update.feature: An update does not change other entries | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-003 | update.feature: The update page of a missing entry is not found<br>update.feature: An update of a missing entry is not found and changes nothing | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-004 | update.feature: A whitespace-only text is rejected and the stored text stays (outline) | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-005 | update.feature: The updated text is stored exactly as entered (outline) | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-006 | update.feature: A second send is blocked while the first is in progress `@manual` | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-007 | update.feature: A store failure keeps the text and shows no success | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-UPD-008 | update.feature: An update keeps the id and the creation instant | functional-spec UC-UPD, state-machines entry lifecycle | (phase 6) |
+| REQ-EXP-001 | export.feature: The export page offers the choices | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-002 | export.feature: An export starts at the beginning of the date in the display zone | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-003 | export.feature: The export is oldest first when no order is given<br>export.feature: The export is newest first when the user chooses descending | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-004 | export.feature: A Markdown export has a header, a separator and one row per entry | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-005 | export.feature: A tab-separated export has a header and one row per entry | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-006 | export.feature: A Markdown export escapes special characters (outline) | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-007 | export.feature: A tab-separated export escapes special characters and does not quote (outline) | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-008 | export.feature: The creation instant is written in the display zone with its offset (outline) | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-009 | export.feature: A missing or invalid date or format delivers no file (outline) | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-EXP-010 | export.feature: An export with no matching entry has only the header rows | functional-spec UC-EXP, technical-spec escape table and ABNF, TS-DATE-1..4 | (phase 6) |
+| REQ-IMP-001 | import.feature: Every legacy entry is copied with its id, text and creation instant<br>import.feature: The update instant equals the creation instant<br>import.feature: A legacy entry with whitespace-only text is copied unchanged | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-IMP-002 | import.feature: A second import is refused<br>import.feature: A store that already holds an entry refuses the import | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-IMP-003 | import.feature: A missing legacy file fails with a reason<br>import.feature: A legacy file with no entry table fails with a reason | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-IMP-004 | import.feature: Every legacy entry is copied with its id, text and creation instant | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-IMP-005 | import.feature: One bad legacy entry undoes the whole import | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-IMP-006 | import.feature: A legacy creation instant with no zone marker is read as UTC | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-IMP-007 | import.feature: The legacy file is not changed | functional-spec UC-IMP, state-machines legacy import, technical-spec legacy store format | (phase 6) |
+| REQ-NFR-001 | browse.feature: Instants are stored in UTC whatever the display zone | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR | (phase 6) |
+| REQ-NFR-002 | browse.feature: The creation instant is shown in the display zone (outline)<br>browse.feature: A configured display zone replaces the default | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR | (phase 6) |
+| REQ-NFR-003 | browse.feature: Entry text is shown as plain text | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR | (phase 6) |
+| REQ-NFR-004 | browse.feature: The system reads the store location from configuration | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR | (phase 6) |
+| REQ-NFR-005 | update.feature: A store failure keeps the text and shows no success | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR | (phase 6) |
+| REQ-NFR-006 | browse.feature: A page of a large diary arrives quickly `@manual` | technical-spec configuration, TS-TIME, TS-TEXT, TS-NFR | (phase 6) |
