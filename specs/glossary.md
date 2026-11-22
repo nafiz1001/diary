@@ -9,6 +9,9 @@ One term has one meaning. Add terms here before other files use them.
 | Legacy implementation | The code before the restart, tagged `legacy-v0.1.0`. A reference only. |
 | Requirement | One testable statement in EARS form with a `REQ-` ID. |
 | Scenario | One Gherkin example that checks a requirement. |
+| Frontend scenario | A scenario tagged `@frontend @manual` that checks the user interface (ADR-0008). A person checks it unless a frontend runner runs it. |
+| Runner | A program that runs scenarios or the contract test against an implementation. A domain runner skips `@manual`. A frontend runner drives the user interface. |
+| Marker | A stable property of a page element (id, name, class, role or data attribute) that a runner uses to find it. |
 | ADR | Architecture decision record. One file per decision. |
 | User | The one person who uses the diary. |
 | Diary | The set of all entries. |

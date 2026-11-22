@@ -155,3 +155,23 @@ Details of the import are in `functional-spec.md` (UC-IMP) and, from phase 5, `.
 13. A step that compares an Instant with a given time (`has the creation instant "T" UTC`) compares at one-second resolution. The store keeps microseconds (TS-TIME-3).
 14. `the entry store is unavailable` makes every later use of the store fail with `store_unavailable`.
 15. `Given the entry store is configured at a location other than the default` makes the scenario use another location for the entry store. The default location is the one in the configuration table.
+16. A scenario tagged `@frontend` checks the user interface (ADR-0008). It is also tagged `@manual`, so the domain runner skips it. A frontend runner may bind its steps and run it.
+17. In `@frontend` scenarios, "the entry text control", "the send control", "the status message", "the export message" and "the created since control" are the terms of the marker index in `../04-design/ui-ux.md`.
+18. `the enhanced send is on` means the optional behaviour of ADR-0004 that sends a form and shows the answer with no change of page. `is off` means the form is sent as a normal page request.
+19. `the system answers slowly` means the system answers a send only after a delay of at least 3 seconds. A person makes it with a slow connection. A runner makes it with a delay in front of the system or in the user interface.
+20. `the connection to the system is lost` means a send cannot reach the system.
+21. `the user is told "M"` means the status message shows M as info or success. `the user is alerted "M"` means it shows M as an error that is announced at once. `with the reason "R"` means the message carries the reason code R.
+22. `the user enters "T" and sends the form` replaces the text in the entry text control with T, then sends the form.
+23. `the page has not changed` means the user interface did not load a new page: the rest of the page stays as it was.
+24. A page state in an Examples table (for example `export page after a request with no date`) names how to reach that state. It starts from an empty diary unless it says other.
+
+## Page reading by runners
+
+A runner that checks pages (a domain runner, a frontend runner or a contract test) follows these rules (ADR-0008).
+
+| ID | Rule |
+|----|------|
+| TS-RUN-1 | A runner reads a page with a document parser. It never matches patterns over the raw markup text. |
+| TS-RUN-2 | A runner finds elements only by the markers in `../04-design/ui-ux.md` (section Marker index). |
+| TS-RUN-3 | Attribute order, extra attributes, extra elements and whitespace between elements are not significant. |
+| TS-RUN-4 | A runner compares text after it decodes character references. |

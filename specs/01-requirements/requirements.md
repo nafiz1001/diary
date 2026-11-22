@@ -80,3 +80,4 @@ The operator runs the import from a command-line tool. The import runs once.
 | REQ-NFR-004 | Ubiquitous | The system shall read the location of the entry store from configuration. |
 | REQ-NFR-005 | Ubiquitous | The system shall confirm a write to the user only after the entry store holds it. |
 | REQ-NFR-006 | State-driven | While the diary holds 100000 entries, the system shall answer a request for any page in less than 1 second on a personal machine. |
+| REQ-NFR-007 | Ubiquitous | The system shall meet the accessibility rules of the UI/UX design (`04-design/ui-ux.md`, section Accessibility) on every page. |

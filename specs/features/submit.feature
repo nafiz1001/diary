@@ -35,7 +35,7 @@ Feature: Submit an entry
     Then the form is empty
     And the user is told that the entry was saved
 
-  @REQ-SUB-004 @manual
+  @REQ-SUB-004 @frontend @manual
   Scenario: A second send is blocked while the first is in progress
     Given the user has sent the form
     And the system has not yet answered

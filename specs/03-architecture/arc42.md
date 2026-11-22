@@ -105,10 +105,11 @@ The system listens on the local address by default because it has no sign-in.
 | 0005 | Single-file relational database with a standard SQL schema |
 | 0006 | First spec-generated implementation (stack named in the ADR) |
 | 0007 | New schema and one-time legacy import |
+| 0008 | Frontend checks as manual Gherkin scenarios |
 
 ## 10. Quality requirements
 
-Quality tree: correctness, performance, portability, usability.
+Quality tree: correctness, performance, portability, usability, accessibility.
 
 | ID | Quality | Stimulus | Response | Measure | Requirement |
 |----|---------|----------|----------|---------|-------------|
@@ -121,6 +122,7 @@ Quality tree: correctness, performance, portability, usability.
 | Q-7 | Data safety | The import fails at the 500th row. | The system rolls back. | The new store has 0 entries. The legacy file is unchanged. | REQ-IMP-005, REQ-IMP-007 |
 | Q-8 | Portability | A developer builds a second implementation. | The developer needs no change to the spec. | All scenarios and the contract test pass. | ADR-0003 |
 | Q-9 | Usability | The user has no script support in the browser. | Every page and form works. | All scenarios pass with no script. | ADR-0004, TS-NFR-1 |
+| Q-10 | Accessibility | The user uses the keyboard only or a screen reader. | Every page and form works. Messages are announced. | All scenarios in `accessibility.feature` pass. | REQ-NFR-007 |
 
 ## 11. Risks and technical debt
 
@@ -134,6 +136,7 @@ Quality tree: correctness, performance, portability, usability.
 | R-6 | The first slice has a schema with no `updated_at`. | Phase 5 completes the schema. Phase 6 changes the first implementation. |
 | R-7 | The legacy store file is not in the repository, so the import test needs a copy from the user. | Ask the user for a copy in phase 6. |
 | R-8 | The OpenAPI file has not been checked with a dedicated linter. A library loads and validates it in the contract test. | Run a linter before a second implementation relies on the file. |
+| R-9 | The implementation of ADR-0006 reads pages with text patterns over the markup (breaks TS-RUN). No check of the new `@frontend` scenarios is recorded. | Change its runner to a document parser and check the `@frontend` scenarios in a follow-up task. |
 
 ## 12. Glossary
 

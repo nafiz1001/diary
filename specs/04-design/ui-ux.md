@@ -33,6 +33,8 @@ When it shows a rejection or failure, it has the attribute `data-reason` with th
 
 ### Accessibility (all pages)
 
+Requirement: REQ-NFR-007. Scenarios: `../features/accessibility.feature`.
+
 1. Every form control has a visible `<label>` linked to it.
 2. Status and error regions are live regions (`role="status"` or `role="alert"`).
 3. After an error, the focus moves to the first control that needs a fix. The user's input stays in the control.
@@ -83,6 +85,8 @@ Requirements: REQ-SUB-001 to REQ-SUB-006.
 5. It enables the button again when the answer arrives.
 
 ### Form state machine (submit and update forms)
+
+Scenarios: `../features/form-script.feature`, and the double send scenarios in `submit.feature` and `update.feature`.
 
 ```mermaid
 stateDiagram-v2
@@ -233,6 +237,32 @@ The form uses method `get` and the action `/export`.
 
 After an invalid request the form shows the values that the user sent, where they are valid choices.
 A valid request makes the browser download the file. The page stays as it is.
+
+## Marker index
+
+Every marker that a runner uses (TS-RUN-2). The term column uses the step terms of the `@frontend` scenarios (technical-spec, step convention 17).
+Do not use other parts of the markup to find an element.
+
+| Page | Term | Marker |
+|------|------|--------|
+| All | Menu | `nav` with class `menu`. Links by their text: `Submission`, `Viewer`, `Export`. |
+| All | Main heading | The one `h1`. |
+| All | Page title | The document `title`. |
+| Submit | Entry text control | Text area with name `submission` (id `submission`). |
+| Submit, Update | Send control | Button with id `submission-button`. |
+| Submit, Update | Status message | Element with id `submission-status`. Kind by `role` (`status` or `alert`). Reason by `data-reason`. |
+| Update | Entry text control | Text area with name `update` (id `update`). |
+| Viewer | Viewer controls | Form with id `viewer-controls`. Inputs with names `limit` and `offset`. |
+| Viewer | Total | Element with id `total`. Number in `data-total`. |
+| Viewer | Entry table | Table with id `entries`. Column headers are `th` with `scope="col"`. |
+| Viewer | Entry row | `tr` with `data-entry-id`. Cells with classes `time`, `note` and `actions`. |
+| Viewer | Paging links | Links with ids `link-latest`, `link-previous` and `link-next`. |
+| Viewer | Empty message | Element with id `empty`. |
+| Viewer | Viewer error | Element with id `viewer-message`. Reason by `data-reason`. |
+| Export | Created since control | Input with name `created_since`. |
+| Export | Export controls | Selects with names `order` and `format`. |
+| Export | Export message | Element with id `export-message`. Reason by `data-reason`. |
+| Not found | Not found marker | `main` with `data-reason="not_found"`. |
 
 ## Import tool (command line)
 

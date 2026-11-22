@@ -26,6 +26,9 @@ Shared files: `glossary.md` (one term per meaning) and `traceability.md`
    The runner skips it. A person checks it in a browser. `traceability.md` records the check.
 5. Each implementation passes the same OpenAPI contract and the same export format grammar.
 6. The legacy implementation is a reference only. It does not have to pass this spec.
+7. A scenario tagged `@frontend` checks the user interface (ADR-0008). It is also tagged `@manual`, so by default a person checks it.
+   An implementation may bind its steps and run it with a frontend runner. Then `traceability.md` records `frontend` instead of `manual`.
+8. A runner that reads pages follows TS-RUN in `02-specification/technical-spec.md`.
 
 ## ID scheme
 
@@ -59,4 +62,4 @@ If code needs behaviour that the spec does not define, stop and update the spec 
 - Specification: every requirement has at least one tagged scenario. Every state machine has a transition table.
 - Architecture: every significant decision has an ADR. Every diagram renders.
 - Design: the OpenAPI file lints. The DDL is standard SQL. Every contract names its requirements.
-- Implementation: all scenarios and the contract test pass. `traceability.md` has the test column filled.
+- Implementation: all scenarios and the contract test pass. Every `@manual` scenario has a recorded check (by hand or by a frontend runner). `traceability.md` has the test column filled.

@@ -59,7 +59,7 @@ Feature: Update an entry
       | tab{tab}separated        |
       | trailing{newline}        |
 
-  @REQ-UPD-006 @manual
+  @REQ-UPD-006 @frontend @manual
   Scenario: A second send is blocked while the first is in progress
     Given the user has sent the update form
     And the system has not yet answered
