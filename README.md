@@ -6,13 +6,15 @@ The project is spec-driven. The specification is language-agnostic. Implementati
 
 | Path | Content |
 |------|---------|
+| [`GETTING_STARTED.md`](GETTING_STARTED.md) | Where to start, and how to add, change or remove a feature. |
 | [`specs/`](specs/README.md) | Requirements (EARS), behaviour (Gherkin, state machines), architecture (domain model, C4, arc42, ADRs), design (UI/UX, LLD, OpenAPI, SQL schema). |
 | [`docs/operator-guide.md`](docs/operator-guide.md) | How to configure, start, back up, restore and upgrade the system, and how to run the one-time import. |
 | [`CHANGELOG.md`](CHANGELOG.md) | Versions of the spec. |
 
 No implementation exists now. Each implementation goes in `implementations/<stack>/` (ADR-0003).
 
-Start with [`specs/README.md`](specs/README.md) for the layers, the ID scheme and the change workflow.
+Start with [`GETTING_STARTED.md`](GETTING_STARTED.md). It gives a reading order and the steps for each kind of change.
+[`specs/README.md`](specs/README.md) holds the rules: the layers, the ID scheme and the change workflow.
 [`specs/traceability.md`](specs/traceability.md) links each requirement to its scenarios, design and tests.
 
 ## Legacy reference
